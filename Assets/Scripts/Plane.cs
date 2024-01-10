@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using UnityEngine;
 using UnityEditor;
-
 using Google.Protobuf;
 
 using System.Reflection;
+using Protocol;
 
 public class Plane : MonoBehaviour {
     [SerializeField]
@@ -215,8 +214,30 @@ public class Plane : MonoBehaviour {
 
     void Awake()
     {
+
+        UnityMainThreadDispatcher.EnsureCreated();
+        IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
       
-        // IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
+    }
+
+    // 수정된 SendMessageToServer 메서드 추가
+    private void SendMessageToServer(string message)
+    {
+        // 소켓 연결 상태를 확인합니다.
+        if (!serverConnected)
+        {
+            Debug.LogError("Socket is not connected.");
+            return;
+        }
+
+        // 데이터를 전송할 바이트 배열로 변환합니다.
+        byte[] data = Encoding.ASCII.GetBytes(message);
+
+        // SendMessage() 대신 UnityMainThreadDispatcher를 사용하여 메인 스레드에서 소켓에 데이터를 보냅니다.
+        UnityMainThreadDispatcher.Enqueue(() =>
+        {
+            SendMessage(data);
+        });
     }
 
     void Start() {
@@ -636,30 +657,14 @@ public class Plane : MonoBehaviour {
         UpdateWeapons(dt);
         //Debug.Log("transform.position"+  transform.position);
         // EnumMessage 클래스 사용 예시
-        var message = new TestMessage
+        var message = new C_CHAT
         {
-            Id = 1,
-            Name = "Example",
-            Status = EnumStatus.Active
+            Msg = "heello",
         };
-        //SendPlanePosition(transform.position);
+        SendPlanePosition(message);
     }
 
-    static ProtoMessageSender()
-    {
-        // 모든 유형의 Proto 메시지를 가져와서 등록
-        Type messageType = typeof(IMessage);
-        Assembly assembly = Assembly.GetExecutingAssembly(); // 이 코드는 실행 중인 어셈블리에 대한 것입니다.
-        foreach (Type type in assembly.GetTypes())
-        {
-            if (messageType.IsAssignableFrom(type) && !type.IsAbstract)
-            {
-                // 메시지 타입의 FullName을 키로 사용하여 메서드 정보 저장
-                MethodInfo method = typeof(ProtoMessageSender).GetMethod(nameof(SendMessage)).MakeGenericMethod(type);
-                messageMethods.Add(type.FullName, method);
-            }
-        }
-    }
+ 
 
     void OnCollisionEnter(Collision collision) {
         for (int i = 0; i < collision.contactCount; i++) {
@@ -685,56 +690,60 @@ public class Plane : MonoBehaviour {
 
 
 
+    // IOCPServerConnect 메서드 수정
     void IOCPServerConnect()
     {
-        if (serverConnected)
+        UnityMainThreadDispatcher.Enqueue(() =>
         {
-            return; // 이미 연결되었으면 중복 호출 방지
-        }
+            if (serverConnected)
+            {
+                return; // 이미 연결되었으면 중복 호출 방지
+            }
 
-        clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        IPAddress serverIP = IPAddress.Parse("127.0.0.1");
-        IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 8888);
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            IPAddress serverIP = IPAddress.Parse("127.0.0.1");
+            IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 7777);
 
-
-
-        try
-        {
-            clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
-            serverConnected = true; // 연결 후에 상태 업데이트
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to connect to server: {e.Message}");
-        }
-
+            try
+            {
+                clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
+                serverConnected = true; // 연결 후에 상태 업데이트
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to connect to server: {e.Message}");
+            }
+        });
     }
+
 
 
     private void ConnectCallback(IAsyncResult result)
     {
-        try
+        UnityMainThreadDispatcher.Enqueue(() =>
         {
-            clientSocket.EndConnect(result);
-            Debug.Log("Connected to server");
+            try
+            {
+                clientSocket.EndConnect(result);
+                Debug.Log("Connected to server");
 
-            // 클라이언트가 서버에 메시지 전송
-            SendMessage("Hello from client!");
+                // 클라이언트가 서버에 메시지 전송
+                SendMessage("Hello from client!");
 
-            // 서버로부터 데이터 수신 대기
-            clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, ReceiveCallback, null);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to connect to server: {e.Message}");
-        }
+                // 서버로부터 데이터 수신 대기
+                clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, ReceiveCallback, null);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to connect to server: {e.Message}");
+            }
+        });
     }
 
-    private void SendMessage(string message)
+    private void SendMessage(byte[] data)
     {
-        byte[] data = Encoding.ASCII.GetBytes(message);
         // 추가 데이터로 전송할 메시지를 전달
-        clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, message);
+        clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
     }
 
     private void SendCallback(IAsyncResult result)
@@ -772,22 +781,18 @@ public class Plane : MonoBehaviour {
         }
     }
 
-    private void SendPlanePosition(Vector3 position)
+    private void SendPlanePosition(C_CHAT message)
     {
         try
         {
-            // 비행기 위치 정보를 문자열로 변환
-            string positionData = position.x + "," + position.y + "," + position.z;
-
-            // 변환된 데이터를 서버로 전송
-            SendMessage(positionData);
+            byte[] serializedData = message.ToByteArray();
+            SendMessage(serializedData);
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to send plane position: {e.Message}");
         }
     }
-
 
 
 
