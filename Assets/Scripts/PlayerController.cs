@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
     [SerializeField]
     new Camera camera;
     [SerializeField]
@@ -15,96 +16,160 @@ public class PlayerController : MonoBehaviour {
     PlaneCamera planeCamera;
     AIController aiController;
 
-    void Start() {
+    void Start()
+    {
         planeCamera = GetComponent<PlaneCamera>();
         SetPlane(plane);    //SetPlane if var is set in inspector
     }
 
-    void SetPlane(Plane plane) {
+    void SetPlane(Plane plane)
+    {
         this.plane = plane;
         aiController = plane.GetComponent<AIController>();
 
-        if (planeHUD != null) {
+        if (planeHUD != null)
+        {
             planeHUD.SetPlane(plane);
             planeHUD.SetCamera(camera);
         }
 
         planeCamera.SetPlane(plane);
     }
-    public void OnToggleHelp(InputAction.CallbackContext context) {
+    public void OnToggleHelp(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
-        if (context.phase == InputActionPhase.Performed) {
+        if (context.phase == InputActionPhase.Performed)
+        {
             planeHUD.ToggleHelpDialogs();
         }
     }
 
-    public void SetThrottleInput(InputAction.CallbackContext context) {
+    public void SetThrottleInput(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
         if (aiController.enabled) return;
 
         plane.SetThrottleInput(context.ReadValue<float>());
     }
 
-    public void OnRollPitchInput(InputAction.CallbackContext context) {
+    public void OnRollPitchInput(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
         var input = context.ReadValue<Vector2>();
-        controlInput = new Vector3(input.y, controlInput.y, -input.x);
+        controlInput = new Vector3(-input.y, controlInput.y, -input.x);
     }
 
-    public void OnYawInput(InputAction.CallbackContext context) {
+    public void OnYawInput(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
         var input = context.ReadValue<float>();
         controlInput = new Vector3(controlInput.x, input, controlInput.z);
     }
 
-    public void OnCameraInput(InputAction.CallbackContext context) {
+    public void OnCameraInput(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
         var input = context.ReadValue<Vector2>();
         planeCamera.SetInput(input);
     }
 
-    public void OnFlapsInput(InputAction.CallbackContext context) {
+    public void OnFlapsInput(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
-        if (context.phase == InputActionPhase.Performed) {
+        if (context.phase == InputActionPhase.Performed)
+        {
             plane.ToggleFlaps();
         }
     }
 
-    public void OnFireMissile(InputAction.CallbackContext context) {
+    public void OnFireMissile(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
-        if (context.phase == InputActionPhase.Performed) {
+        if (context.phase == InputActionPhase.Performed)
+        {
             plane.TryFireMissile();
         }
     }
 
-    public void OnFireCannon(InputAction.CallbackContext context) {
+    public void OnFireCannon(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
-        if (context.phase == InputActionPhase.Started) {
+        if (context.phase == InputActionPhase.Started)
+        {
             plane.SetCannonInput(true);
-        } else if (context.phase == InputActionPhase.Canceled) {
+        }
+        else if (context.phase == InputActionPhase.Canceled)
+        {
             plane.SetCannonInput(false);
         }
     }
 
-    public void OnToggleAI(InputAction.CallbackContext context) {
+    public void OnToggleAI(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
 
-        if (aiController != null) {
+        if (aiController != null)
+        {
             aiController.enabled = !aiController.enabled;
         }
     }
 
-    void Update() {
+    public void OnWASDInput(InputAction.CallbackContext context)
+    {
         if (plane == null) return;
         if (aiController.enabled) return;
 
+        var input = context.ReadValue<Vector2>();
+        controlInput = new Vector3(-input.y, controlInput.y, -input.x);
+    }
+
+    public void OnMouseLook(InputAction.CallbackContext context)
+    {
+
+        if (plane == null) return;
+        if (aiController.enabled) return;
+
+        // 마우스의 변화량을 가져와서 사용
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+        controlInput = new Vector3(mouseDelta.y, controlInput.y, -mouseDelta.x);
+
+        // 여기서 controlInput 값을 이용하여 원하는 동작 수행
+        transform.Rotate(new Vector3(controlInput.y, controlInput.x, 0) * Time.deltaTime);
+
+
+    }
+
+    void OnEnable()
+    {
+        // WASD 입력 활성화
+        InputSystem.EnableDevice(InputSystem.GetDevice<Keyboard>());
+
+        // 마우스 입력 활성화
+        InputSystem.EnableDevice(InputSystem.GetDevice<Mouse>());
+    }
+
+    void OnDisable()
+    {
+        // WASD 입력 비활성화
+        InputSystem.DisableDevice(InputSystem.GetDevice<Keyboard>());
+
+        // 마우스 입력 비활성화
+        InputSystem.DisableDevice(InputSystem.GetDevice<Mouse>());
+    }
+
+    void Update()
+    {
+        if (plane == null) return;
+        if (aiController.enabled) return;
+
+     
         plane.SetControlInput(controlInput);
     }
 }

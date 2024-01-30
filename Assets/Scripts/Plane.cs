@@ -128,6 +128,7 @@ public class Plane : MonoBehaviour {
     float cannonDebounceTimer;
     float cannonFiringTimer;
 
+
     public float MaxHealth {
         get {
             return maxHealth;
@@ -249,22 +250,33 @@ public class Plane : MonoBehaviour {
         deathEffect.SetActive(true);
     }
 
-    void UpdateThrottle(float dt) {
+    void UpdateThrottle(float dt) // 게임패드 동작코드
+    {
         float target = 0;
         if (throttleInput > 0) target = 1;
 
-        //throttle input is [-1, 1]
-        //throttle is [0, 1]
+        // 스로틀 입력 범위: [-1, 1]
+        // 스로틀 값 범위: [0, 1]
+        // Throttle 값은 Utilities.MoveTo 함수를 사용하여 목표값(target)으로 이동
+        // 이동 속도는 throttleSpeed와 현재 입력의 절댓값에 비례
         Throttle = Utilities.MoveTo(Throttle, target, throttleSpeed * Mathf.Abs(throttleInput), dt);
 
+        // 에어브레이크가 활성화된 경우
         AirbrakeDeployed = Throttle == 0 && throttleInput == -1;
 
-        if (AirbrakeDeployed) {
-            foreach (var lg in landingGear) {
+        // 에어브레이크가 활성화되면 착륙장치의 재질을 변경하여 브레이크 효과
+        if (AirbrakeDeployed)
+        {
+            foreach (var lg in landingGear)
+            {
                 lg.sharedMaterial = landingGearBrakesMaterial;
             }
-        } else {
-            foreach (var lg in landingGear) {
+        }
+        else
+        {
+            // 에어브레이크가 비활성화된 경우 원래의 착륙장치 재질로 변경
+            foreach (var lg in landingGear)
+            {
                 lg.sharedMaterial = landingGearDefaultMaterial;
             }
         }
@@ -530,24 +542,29 @@ public class Plane : MonoBehaviour {
         }
     }
 
-    void FixedUpdate() {
+    void FixedUpdate()
+    {
         float dt = Time.fixedDeltaTime;
 
-        //calculate at start, to capture any changes that happened externally
+        // 시작 시 상태를 계산하여 외부 변경을 캡처
         CalculateState(dt);
         CalculateGForce(dt);
         UpdateFlaps();
 
-        //handle user input
+        // 사용자 입력을 처리
+        //HandleMouseAndKeyboardInput();
         UpdateThrottle(dt);
 
-        if (!Dead) {
-            //apply updates
+        if (!Dead)
+        {
+            // 업데이트 적용
             UpdateThrust();
             UpdateLift();
             UpdateSteering(dt);
-        } else {
-            //align with velocity
+        }
+        else
+        {
+            // 속도에 맞춰 정렬
             Vector3 up = Rigidbody.rotation * Vector3.up;
             Vector3 forward = Rigidbody.velocity.normalized;
             Rigidbody.rotation = Quaternion.LookRotation(forward, up);
@@ -556,10 +573,10 @@ public class Plane : MonoBehaviour {
         UpdateDrag();
         UpdateAngularDrag();
 
-        //calculate again, so that other systems can read this plane's state
+        // 다시 계산하여 다른 시스템에서 비행기 상태를 읽을 수 있게 함
         CalculateState(dt);
 
-        //update weapon state
+        // 무기 상태 업데이트
         UpdateWeapons(dt);
     }
 
@@ -584,4 +601,11 @@ public class Plane : MonoBehaviour {
             return;
         }
     }
+
+ 
+
+
+
+
+
 }
