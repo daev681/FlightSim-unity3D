@@ -1,5 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
 using UnityEngine;
 
 public class Plane : MonoBehaviour {
@@ -128,6 +132,9 @@ public class Plane : MonoBehaviour {
     float cannonDebounceTimer;
     float cannonFiringTimer;
 
+    private Socket clientSocket;
+    private byte[] receiveBuffer = new byte[1024];
+
 
     public float MaxHealth {
         get {
@@ -213,6 +220,8 @@ public class Plane : MonoBehaviour {
         missileLockDirection = Vector3.forward;
 
         Rigidbody.velocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
+
+        IOCPServerConnect();
     }
 
     public void SetThrottleInput(float input) {
@@ -289,28 +298,28 @@ public class Plane : MonoBehaviour {
     }
 
     void CalculateAngleOfAttack() {
-        if (LocalVelocity.sqrMagnitude < 0.1f) {
+        if (LocalVelocity.sqrMagnitude < 0.1f) { // 비행속도가 없다면 종료
             AngleOfAttack = 0;
             AngleOfAttackYaw = 0;
             return;
         }
 
-        AngleOfAttack = Mathf.Atan2(-LocalVelocity.y, LocalVelocity.z);
-        AngleOfAttackYaw = Mathf.Atan2(LocalVelocity.x, LocalVelocity.z);
+        AngleOfAttack = Mathf.Atan2(-LocalVelocity.y, LocalVelocity.z); // 비행체의 상하 움직임 공격각도 계산
+        AngleOfAttackYaw = Mathf.Atan2(LocalVelocity.x, LocalVelocity.z); //비행체의 좌우 움직임 공격각도 계산
     }
 
     void CalculateGForce(float dt) {
-        var invRotation = Quaternion.Inverse(Rigidbody.rotation);
-        var acceleration = (Velocity - lastVelocity) / dt;
+        var invRotation = Quaternion.Inverse(Rigidbody.rotation); // 회전의 역값 계산
+        var acceleration = (Velocity - lastVelocity) / dt; // 가속도를 계산
         LocalGForce = invRotation * acceleration;
         lastVelocity = Velocity;
     }
 
     void CalculateState(float dt) {
-        var invRotation = Quaternion.Inverse(Rigidbody.rotation);
+        var invRotation = Quaternion.Inverse(Rigidbody.rotation); // 회전의 역값을 계산
         Velocity = Rigidbody.velocity;
-        LocalVelocity = invRotation * Velocity;  //transform world velocity into local space
-        LocalAngularVelocity = invRotation * Rigidbody.angularVelocity;  //transform into local space
+        LocalVelocity = invRotation * Velocity;  // 변환된 속도를 계산
+        LocalAngularVelocity = invRotation * Rigidbody.angularVelocity;  //변환된 가속도를 계산
 
         CalculateAngleOfAttack();
     }
@@ -534,7 +543,7 @@ public class Plane : MonoBehaviour {
         if (cannonFiring && cannonFiringTimer == 0) {
             cannonFiringTimer = 60f / cannonFireRate;
 
-            var spread = Random.insideUnitCircle * cannonSpread;
+            var spread = UnityEngine.Random.insideUnitCircle * cannonSpread;
 
             var bulletGO = Instantiate(bulletPrefab, cannonSpawnPoint.position, cannonSpawnPoint.rotation * Quaternion.Euler(spread.x, spread.y, 0));
             var bullet = bulletGO.GetComponent<Bullet>();
@@ -546,10 +555,10 @@ public class Plane : MonoBehaviour {
     {
         float dt = Time.fixedDeltaTime;
 
-        // 시작 시 상태를 계산하여 외부 변경을 캡처
-        CalculateState(dt);
-        CalculateGForce(dt);
-        UpdateFlaps();
+      
+        CalculateState(dt); 
+        CalculateGForce(dt); 
+        UpdateFlaps(); // 플랩의 상태 업데이트
 
         // 사용자 입력을 처리
         //HandleMouseAndKeyboardInput();
@@ -602,7 +611,74 @@ public class Plane : MonoBehaviour {
         }
     }
 
- 
+
+
+    void IOCPServerConnect()
+    {
+        clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        IPAddress serverIP = IPAddress.Parse("127.0.0.1");
+        IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 8888);
+
+        try
+        {
+            clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to connect to server: {e.Message}");
+        }
+    }
+
+
+    private void ConnectCallback(IAsyncResult result)
+    {
+        try
+        {
+            clientSocket.EndConnect(result);
+            Debug.Log("Connected to server");
+
+            // 클라이언트가 서버에 메시지 전송
+            SendMessage("Hello from client!");
+
+            // 서버로부터 데이터 수신 대기
+            clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, ReceiveCallback, null);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to connect to server: {e.Message}");
+        }
+    }
+
+    private void SendMessage(string message)
+    {
+        byte[] data = Encoding.ASCII.GetBytes(message);
+        clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
+    }
+
+    private void SendCallback(IAsyncResult result)
+    {
+        clientSocket.EndSend(result);
+        Debug.Log("Message sent to server");
+    }
+
+    private void ReceiveCallback(IAsyncResult result)
+    {
+        int bytesRead = clientSocket.EndReceive(result);
+        string receivedMessage = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead);
+        Debug.Log($"Received message from server: {receivedMessage}");
+
+        // 서버로부터 추가 데이터 수신 대기
+        clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, ReceiveCallback, null);
+    }
+
+    void OnDestroy()
+    {
+        if (clientSocket != null && clientSocket.Connected)
+        {
+            clientSocket.Shutdown(SocketShutdown.Both);
+            clientSocket.Close();
+        }
+    }
 
 
 

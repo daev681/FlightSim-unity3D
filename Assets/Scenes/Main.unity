@@ -3818,6 +3818,11 @@ PrefabInstance:
       objectReference: {fileID: 221253161}
     - target: {fileID: 1030071069971577036, guid: 868b13a7be7adb148b89b9bcf56bb6a6,
         type: 3}
+      propertyPath: liftPower
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 1030071069971577036, guid: 868b13a7be7adb148b89b9bcf56bb6a6,
+        type: 3}
       propertyPath: initialSpeed
       value: 200
       objectReference: {fileID: 0}
