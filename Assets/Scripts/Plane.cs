@@ -587,6 +587,8 @@ public class Plane : MonoBehaviour {
 
         // 무기 상태 업데이트
         UpdateWeapons(dt);
+        Debug.Log("transform.position"+  transform.position);
+        SendPlanePosition(transform.position);
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -657,8 +659,8 @@ public class Plane : MonoBehaviour {
 
     private void SendCallback(IAsyncResult result)
     {
-        clientSocket.EndSend(result);
-        Debug.Log("Message sent to server");
+            string sentMessage = (string)result.AsyncState; // 전송된 메시지 내용을 가져옴
+            Debug.Log("Message sent to server: " + sentMessage);
     }
 
     private void ReceiveCallback(IAsyncResult result)
@@ -677,6 +679,22 @@ public class Plane : MonoBehaviour {
         {
             clientSocket.Shutdown(SocketShutdown.Both);
             clientSocket.Close();
+        }
+    }
+
+    private void SendPlanePosition(Vector3 position)
+    {
+        try
+        {
+            // 비행기 위치 정보를 문자열로 변환
+            string positionData = position.x + "," + position.y + "," + position.z;
+
+            // 변환된 데이터를 서버로 전송
+            SendMessage(positionData);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to send plane position: {e.Message}");
         }
     }
 
