@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using UnityEngine;
+using UnityEditor;
 
 public class Plane : MonoBehaviour {
     [SerializeField]
@@ -134,6 +135,10 @@ public class Plane : MonoBehaviour {
 
     private Socket clientSocket;
     private byte[] receiveBuffer = new byte[1024];
+    private bool serverConnected = false;
+
+
+
 
 
     public float MaxHealth {
@@ -203,6 +208,11 @@ public class Plane : MonoBehaviour {
         }
     }
 
+    void Awake()
+    {
+       //  IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
+    }
+
     void Start() {
         animation = GetComponent<PlaneAnimation>();
         Rigidbody = GetComponent<Rigidbody>();
@@ -221,7 +231,36 @@ public class Plane : MonoBehaviour {
 
         Rigidbody.velocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
 
-        IOCPServerConnect();
+
+
+      
+
+    }
+
+    void SpawnF15()
+    {
+        // 프리팹 경로 설정
+        string prefabPath = "Assets/Prefabs/F15.prefab";
+
+        // 프리팹 로드
+        GameObject f15Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+        if (f15Prefab != null)
+        {
+            // 프리팹 복제
+            GameObject newF15 = Instantiate(f15Prefab);
+
+            // 복제된 오브젝트 이름 변경
+            newF15.name = "F15(2)";
+
+            // 새로운 위치 및 회전으로 이동
+            newF15.transform.position = new Vector3(UnityEngine.Random.Range(-2300f, -2500f), UnityEngine.Random.Range(0f, 150f), UnityEngine.Random.Range(-2300f, -2500f));
+            newF15.transform.rotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+        }
+        else
+        {
+            Debug.LogError("F15Prefab을 로드할 수 없습니다.");
+        }
     }
 
     public void SetThrottleInput(float input) {
@@ -496,6 +535,8 @@ public class Plane : MonoBehaviour {
         var missileGO = Instantiate(missilePrefab, hardpoint.position, hardpoint.rotation);
         var missile = missileGO.GetComponent<Missile>();
         missile.Launch(this, MissileLocked ? Target : null);
+        SpawnF15();
+
     }
 
     void UpdateWeapons(float dt) {
@@ -587,8 +628,8 @@ public class Plane : MonoBehaviour {
 
         // 무기 상태 업데이트
         UpdateWeapons(dt);
-        Debug.Log("transform.position"+  transform.position);
-        SendPlanePosition(transform.position);
+        //Debug.Log("transform.position"+  transform.position);
+       // SendPlanePosition(transform.position);
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -617,6 +658,11 @@ public class Plane : MonoBehaviour {
 
     void IOCPServerConnect()
     {
+        if (serverConnected)
+        {
+            return; // 이미 연결되었으면 중복 호출 방지
+        }
+
         clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         IPAddress serverIP = IPAddress.Parse("127.0.0.1");
         IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 8888);
@@ -624,11 +670,13 @@ public class Plane : MonoBehaviour {
         try
         {
             clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
+            serverConnected = true; // 연결 후에 상태 업데이트
         }
         catch (Exception e)
         {
             Debug.LogError($"Failed to connect to server: {e.Message}");
         }
+
     }
 
 
@@ -654,13 +702,24 @@ public class Plane : MonoBehaviour {
     private void SendMessage(string message)
     {
         byte[] data = Encoding.ASCII.GetBytes(message);
-        clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
+        // 추가 데이터로 전송할 메시지를 전달
+        clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, message);
     }
 
     private void SendCallback(IAsyncResult result)
     {
-            string sentMessage = (string)result.AsyncState; // 전송된 메시지 내용을 가져옴
-            Debug.Log("Message sent to server: " + sentMessage);
+        try
+        {
+            // 비동기 작업을 완료하고 전송된 바이트 수를 반환
+            int bytesSent = clientSocket.EndSend(result);
+            // 추가 데이터로 전달된 메시지를 가져와서 로그에 출력
+            string sentMessage = (string)result.AsyncState;
+            Debug.Log($"Sent {bytesSent} bytes to server: {sentMessage}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to send data to server: {e.Message}");
+        }
     }
 
     private void ReceiveCallback(IAsyncResult result)

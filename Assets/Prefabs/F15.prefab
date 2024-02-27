@@ -2200,6 +2200,7 @@ MonoBehaviour:
   cannonSpawnPoint: {fileID: 8714942240040698235}
   bulletPrefab: {fileID: 2669934981140404945, guid: a6a331fa124eaf148bd5a44b8f133e51,
     type: 3}
+  F15Prefab: {fileID: 8849735085998360814}
 --- !u!114 &3168297468136084144
 MonoBehaviour:
   m_ObjectHideFlags: 0
