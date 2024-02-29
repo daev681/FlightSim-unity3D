@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+enum EnumStatus {
+    ACTIVE = 0;
+    INACTIVE = 1;
+}
+
+message TestMessage {
+    int32 Id = 1;
+    string Name = 2;
+    EnumStatus Status = 3;
+}

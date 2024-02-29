@@ -7,6 +7,10 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 
+using Google.Protobuf;
+
+using System.Reflection;
+
 public class Plane : MonoBehaviour {
     [SerializeField]
     float maxHealth;
@@ -139,7 +143,8 @@ public class Plane : MonoBehaviour {
 
 
 
-
+    // 메시지 타입에 대한 딕셔너리 생성
+    private static Dictionary<string, MethodInfo> messageMethods = new Dictionary<string, MethodInfo>();
 
     public float MaxHealth {
         get {
@@ -210,7 +215,8 @@ public class Plane : MonoBehaviour {
 
     void Awake()
     {
-       //  IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
+      
+        // IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
     }
 
     void Start() {
@@ -629,7 +635,30 @@ public class Plane : MonoBehaviour {
         // 무기 상태 업데이트
         UpdateWeapons(dt);
         //Debug.Log("transform.position"+  transform.position);
-       // SendPlanePosition(transform.position);
+        // EnumMessage 클래스 사용 예시
+        var message = new TestMessage
+        {
+            Id = 1,
+            Name = "Example",
+            Status = EnumStatus.Active
+        };
+        //SendPlanePosition(transform.position);
+    }
+
+    static ProtoMessageSender()
+    {
+        // 모든 유형의 Proto 메시지를 가져와서 등록
+        Type messageType = typeof(IMessage);
+        Assembly assembly = Assembly.GetExecutingAssembly(); // 이 코드는 실행 중인 어셈블리에 대한 것입니다.
+        foreach (Type type in assembly.GetTypes())
+        {
+            if (messageType.IsAssignableFrom(type) && !type.IsAbstract)
+            {
+                // 메시지 타입의 FullName을 키로 사용하여 메서드 정보 저장
+                MethodInfo method = typeof(ProtoMessageSender).GetMethod(nameof(SendMessage)).MakeGenericMethod(type);
+                messageMethods.Add(type.FullName, method);
+            }
+        }
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -666,6 +695,8 @@ public class Plane : MonoBehaviour {
         clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         IPAddress serverIP = IPAddress.Parse("127.0.0.1");
         IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 8888);
+
+
 
         try
         {
