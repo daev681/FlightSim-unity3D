@@ -145,6 +145,9 @@ public class Plane : MonoBehaviour {
     // 메시지 타입에 대한 딕셔너리 생성
     private static Dictionary<string, MethodInfo> messageMethods = new Dictionary<string, MethodInfo>();
 
+    //
+    private ulong playerId;
+
     public float MaxHealth {
         get {
             return maxHealth;
@@ -215,30 +218,12 @@ public class Plane : MonoBehaviour {
     void Awake()
     {
 
-        UnityMainThreadDispatcher.EnsureCreated();
+       
         IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
       
     }
 
-    // 수정된 SendMessageToServer 메서드 추가
-    private void SendMessageToServer(string message)
-    {
-        // 소켓 연결 상태를 확인합니다.
-        if (!serverConnected)
-        {
-            Debug.LogError("Socket is not connected.");
-            return;
-        }
-
-        // 데이터를 전송할 바이트 배열로 변환합니다.
-        byte[] data = Encoding.ASCII.GetBytes(message);
-
-        // SendMessage() 대신 UnityMainThreadDispatcher를 사용하여 메인 스레드에서 소켓에 데이터를 보냅니다.
-        UnityMainThreadDispatcher.Enqueue(() =>
-        {
-            SendMessage(data);
-        });
-    }
+ 
 
     void Start() {
         animation = GetComponent<PlaneAnimation>();
@@ -657,11 +642,15 @@ public class Plane : MonoBehaviour {
         UpdateWeapons(dt);
         //Debug.Log("transform.position"+  transform.position);
         // EnumMessage 클래스 사용 예시
-        var message = new C_CHAT
-        {
-            Msg = "heello",
-        };
-        SendPlanePosition(message);
+
+
+        //var message = new C_CHAT
+        //{
+        //    Msg = "hi"
+        //};
+        //SendPlanePosition(message);
+
+
     }
 
  
@@ -690,71 +679,158 @@ public class Plane : MonoBehaviour {
 
 
 
-    // IOCPServerConnect 메서드 수정
-    void IOCPServerConnect()
+    private void IOCPServerConnect()
     {
-        UnityMainThreadDispatcher.Enqueue(() =>
+        if (serverConnected)
         {
-            if (serverConnected)
-            {
-                return; // 이미 연결되었으면 중복 호출 방지
-            }
+            return; // 이미 연결되었으면 중복 호출 방지
+        }
 
-            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPAddress serverIP = IPAddress.Parse("127.0.0.1");
-            IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 7777);
+        clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        IPAddress serverIP = IPAddress.Parse("127.0.0.1");
+        IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 7777);
 
-            try
-            {
-                clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
-                serverConnected = true; // 연결 후에 상태 업데이트
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Failed to connect to server: {e.Message}");
-            }
-        });
+        try
+        {
+            clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
+            serverConnected = true; // 연결 후에 상태 업데이트
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to connect to server: {e.Message}");
+        }
     }
-
-
 
     private void ConnectCallback(IAsyncResult result)
     {
-        UnityMainThreadDispatcher.Enqueue(() =>
+        try
         {
-            try
-            {
-                clientSocket.EndConnect(result);
-                Debug.Log("Connected to server");
+            clientSocket.EndConnect(result);
+            Debug.Log("Connected to server");
 
-                // 클라이언트가 서버에 메시지 전송
-                SendMessage("Hello from client!");
+            // 로그인 요청 보내기
+            var loginMessage = new C_LOGIN();
+            SendToServer(loginMessage);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to connect to server: {e.Message}");
+        }
+    }
 
-                // 서버로부터 데이터 수신 대기
-                clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, ReceiveCallback, null);
-            }
-            catch (Exception e)
+    private void ReceiveCallback(IAsyncResult ar)
+    {
+        try
+        {
+            int receivedBytes = clientSocket.EndReceive(ar);
+
+            if (receivedBytes > 0)
             {
-                Debug.LogError($"Failed to connect to server: {e.Message}");
+                // 받은 데이터를 처리
+                byte[] receivedData = new byte[receivedBytes];
+                Array.Copy(receiveBuffer, receivedData, receivedBytes);
+
+                // 서버로부터 받은 메시지 처리
+                ProcessReceivedMessage(receivedData);
+
+                // 다시 서버로부터 데이터를 비동기적으로 수신하기 위해 BeginReceive 메서드 호출
+                clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), null);
             }
-        });
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error: {ex.Message}");
+        }
+    }
+
+    private void ProcessReceivedMessage(byte[] data)
+    {
+        // 받은 데이터를 메시지 객체로 파싱
+        IMessage message = ParseMessage(data);
+
+        // 메시지 타입에 따라 처리
+        if (message is S_LOGIN)
+        {
+            HandleLoginResponse((S_LOGIN)message);
+        }
+        else if (message is S_ENTER_GAME)
+        {
+            HandleEnterGameResponse((S_ENTER_GAME)message);
+        }
+        else if (message is S_CHAT)
+        {
+            HandleChatResponse((S_CHAT)message);
+        }
+        // 추가적인 메시지 타입에 대한 처리도 가능
+    }
+
+    private IMessage ParseMessage(byte[] data)
+    {
+        try
+        {
+            // 받은 데이터를 S_LOGIN 메시지로 파싱
+            S_LOGIN loginMessage = S_LOGIN.Parser.ParseFrom(data);
+            return loginMessage; // 파싱된 메시지 객체 반환
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to parse message: {ex.Message}");
+            return null;
+        }
+    }
+    private void HandleLoginResponse(S_LOGIN message)
+    {
+        // 로그인 응답 처리
+        if (message.Success)
+        {
+            Debug.Log("Login successful");
+            // 플레이어 아이디 저장
+            playerId = message.Players[0].Id;
+            // 방에 입장 요청 보내기
+            var enterGameMessage = new C_ENTER_GAME { PlayerIndex = playerId };
+            SendToServer(enterGameMessage);
+        }
+        else
+        {
+            Debug.LogError("Login failed");
+        }
+    }
+
+    private void HandleEnterGameResponse(S_ENTER_GAME message)
+    {
+        // 방 입장 응답 처리
+        if (message.Success)
+        {
+            Debug.Log("Entered game successfully");
+            // 채팅 메시지 보내기
+            var chatMessage = new C_CHAT { Msg = "Hello, world!" };
+            SendToServer(chatMessage);
+        }
+        else
+        {
+            Debug.LogError("Failed to enter game");
+        }
+    }
+
+    private void HandleChatResponse(S_CHAT message)
+    {
+        // 채팅 응답 처리
+        Debug.Log($"Received chat message from player {message.PlayerId}: {message.Msg}");
+    }
+
+    private void SendToServer(IMessage message)
+    {
+        // 메시지를 직렬화하여 서버로 전송
+        byte[] serializedData = message.ToByteArray();
+        SendMessage(serializedData);
     }
 
     private void SendMessage(byte[] data)
     {
-        // 추가 데이터로 전송할 메시지를 전달
-        clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
-    }
-
-    private void SendCallback(IAsyncResult result)
-    {
         try
         {
-            // 비동기 작업을 완료하고 전송된 바이트 수를 반환
-            int bytesSent = clientSocket.EndSend(result);
-            // 추가 데이터로 전달된 메시지를 가져와서 로그에 출력
-            string sentMessage = (string)result.AsyncState;
-            Debug.Log($"Sent {bytesSent} bytes to server: {sentMessage}");
+            // 비동기 방식으로 데이터를 보냅니다.
+            clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
         }
         catch (Exception e)
         {
@@ -762,15 +838,21 @@ public class Plane : MonoBehaviour {
         }
     }
 
-    private void ReceiveCallback(IAsyncResult result)
+    private void SendCallback(IAsyncResult result)
     {
-        int bytesRead = clientSocket.EndReceive(result);
-        string receivedMessage = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead);
-        Debug.Log($"Received message from server: {receivedMessage}");
-
-        // 서버로부터 추가 데이터 수신 대기
-        clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, ReceiveCallback, null);
+        try
+        {
+            // 비동기 작업을 완료하고 전송된 바이트 수를 반환
+            int sentBytes = clientSocket.EndSend(result);
+            Debug.Log($"Sent {sentBytes} bytes to server");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to send data to server: {e.Message}");
+        }
     }
+
+
 
     void OnDestroy()
     {
@@ -781,18 +863,8 @@ public class Plane : MonoBehaviour {
         }
     }
 
-    private void SendPlanePosition(C_CHAT message)
-    {
-        try
-        {
-            byte[] serializedData = message.ToByteArray();
-            SendMessage(serializedData);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to send plane position: {e.Message}");
-        }
-    }
+   
+
 
 
 
