@@ -216,11 +216,8 @@ public class Plane : MonoBehaviour {
     }
 
     void Awake()
-    {
-
-       
-        IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
-      
+    { 
+       IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
     }
 
  
@@ -644,11 +641,10 @@ public class Plane : MonoBehaviour {
         // EnumMessage 클래스 사용 예시
 
 
-        //var message = new C_CHAT
-        //{
-        //    Msg = "hi"
-        //};
-        //SendPlanePosition(message);
+        var loginMessage = new C_CHAT() { 
+         Msg = "?"
+        };
+        SendToServer(loginMessage);
 
 
     }
@@ -818,18 +814,40 @@ public class Plane : MonoBehaviour {
         Debug.Log($"Received chat message from player {message.PlayerId}: {message.Msg}");
     }
 
+
     private void SendToServer(IMessage message)
     {
-        // 메시지를 직렬화하여 서버로 전송
-        byte[] serializedData = message.ToByteArray();
+        // 메시지를 직렬화하여 패킷에 헤더를 추가하고 서버로 전송
+        byte[] serializedData = SerializeWithHeader(message);
         SendMessage(serializedData);
+    }
+
+    private byte[] SerializeWithHeader(IMessage message)
+    {
+        // 메시지를 직렬화하여 데이터를 얻음
+        byte[] messageData = message.ToByteArray();
+
+        // 헤더를 생성하고 헤더와 메시지 데이터의 길이를 계산
+        PacketHeader header = new PacketHeader
+        {
+            size = (ushort)(sizeof(ushort) * 2 + messageData.Length), // 패킷 길이 = 헤더 길이(ushort 2개) + 메시지 데이터 길이
+            id = 1004 // 패킷 ID 등 필요한 정보를 여기에 추가
+        };
+
+        // 헤더와 메시지 데이터를 합쳐서 패킷을 생성
+        byte[] packet = new byte[sizeof(ushort) * 2 + messageData.Length];
+        Buffer.BlockCopy(BitConverter.GetBytes(header.size), 0, packet, 0, sizeof(ushort));
+        Buffer.BlockCopy(BitConverter.GetBytes(header.id), 0, packet, sizeof(ushort), sizeof(ushort));
+        Buffer.BlockCopy(messageData, 0, packet, sizeof(ushort) * 2, messageData.Length);
+
+        return packet;
     }
 
     private void SendMessage(byte[] data)
     {
         try
         {
-            // 비동기 방식으로 데이터를 보냅니다.
+            // 비동기 방식으로 데이터를 보낸다.
             clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
         }
         catch (Exception e)
@@ -870,3 +888,4 @@ public class Plane : MonoBehaviour {
 
 
 }
+
