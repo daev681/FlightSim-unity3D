@@ -141,7 +141,7 @@ public class Plane : MonoBehaviour {
     private bool serverConnected = false;
 
     private PacketManager packetManager;
-
+    private PlayerManager playerManager;
 
     // 메시지 타입에 대한 딕셔너리 생성
     private static Dictionary<string, MethodInfo> messageMethods = new Dictionary<string, MethodInfo>();
@@ -232,10 +232,12 @@ public class Plane : MonoBehaviour {
 
     void Awake()
     {
+      
         if (instance == null)
         {
             instance = this;
-            packetManager = gameObject.AddComponent<PacketManager>();
+            playerManager = PlayerManager.Instance;
+            packetManager = PacketManager.Instance;
             IOCPServerConnect();
         }
         else
@@ -734,13 +736,17 @@ public class Plane : MonoBehaviour {
             {
                 // 로그인 요청 보내기
 
-                var loginMessage = new C_LOGIN();
-                var enterMessage = new C_ENTER_GAME()
+
+                for (int i = 0; i < 3; i++)
                 {
-                    PlayerIndex = 0
-                };
-                SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
-                SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
+                    // 로그인 메시지 생성 및 전송
+                    var loginMessage = new C_LOGIN();
+                    SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
+
+                    // 게임 입장 메시지 생성 및 전송
+                    var enterMessage = new C_ENTER_GAME() { PlayerIndex = (ulong)i };
+                    SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
+                }
                 StartReceive();
             }
         

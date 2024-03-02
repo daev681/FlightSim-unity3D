@@ -16,6 +16,11 @@ public class S_LOGIN_Handler : IPacketHandler
     {
         S_LOGIN loginPacket = S_LOGIN.Parser.ParseFrom(packetBody);
         Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
+        if (loginPacket.Success)
+        {
+            PlayerManager.Instance.AddPlayer((int)loginPacket.Players[0].Id, loginPacket.Players[0].Name);
+        }
+    
     }
 }
 
@@ -23,10 +28,24 @@ public class S_LOGIN_Handler : IPacketHandler
 public class PacketManager : MonoBehaviour
 {
     private readonly Dictionary<PacketType, IPacketHandler> packetHandlers = new Dictionary<PacketType, IPacketHandler>();
+    private static PacketManager instance;
+    public static PacketManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = new PacketManager();
+                instance.OnPacketSetting();
+            }
+            return instance;
+        }
+    }
+
 
     public void OnRecv(byte[] buffer, int len)
     {
-        OnPacketSetting();
+   
         int processLen = 0;
         while (true)
         {
