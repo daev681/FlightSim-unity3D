@@ -140,6 +140,7 @@ public class Plane : MonoBehaviour {
     private byte[] receiveBuffer = new byte[1024];
     private bool serverConnected = false;
 
+    private PacketManager packetManager;
 
 
     // 메시지 타입에 대한 딕셔너리 생성
@@ -216,13 +217,16 @@ public class Plane : MonoBehaviour {
     }
 
     void Awake()
-    { 
-       IOCPServerConnect(); // Awake에서 호출하여 Start보다 먼저 실행됨
+    {
+        packetManager = gameObject.AddComponent<PacketManager>(); 
+        IOCPServerConnect(); 
+
     }
 
  
 
     void Start() {
+       
         animation = GetComponent<PlaneAnimation>();
         Rigidbody = GetComponent<Rigidbody>();
 
@@ -240,10 +244,7 @@ public class Plane : MonoBehaviour {
 
         Rigidbody.velocity = Rigidbody.rotation * new Vector3(0, 0, initialSpeed);
 
-
-
-      
-
+  
     }
 
     void SpawnF15()
@@ -641,21 +642,24 @@ public class Plane : MonoBehaviour {
         // EnumMessage 클래스 사용 예시
 
 
-        var loginMessage = new C_CHAT() { 
-         Msg = "?"
-        };
-        SendToServer(loginMessage);
+        //var loginMessage = new C_CHAT() { 
+        // Msg = "?"
+        //};
+        //SendToServer(loginMessage);
 
 
     }
 
- 
 
-    void OnCollisionEnter(Collision collision) {
-        for (int i = 0; i < collision.contactCount; i++) {
+
+    void OnCollisionEnter(Collision collision)
+    {
+        for (int i = 0; i < collision.contactCount; i++)
+        {
             var contact = collision.contacts[i];
 
-            if (landingGear.Contains(contact.thisCollider)) {
+            if (landingGear.Contains(contact.thisCollider))
+            {
                 return;
             }
 
@@ -665,7 +669,8 @@ public class Plane : MonoBehaviour {
             Rigidbody.position = contact.point;
             Rigidbody.rotation = Quaternion.Euler(0, Rigidbody.rotation.eulerAngles.y, 0);
 
-            foreach (var go in graphics) {
+            foreach (var go in graphics)
+            {
                 go.SetActive(false);
             }
 
@@ -703,10 +708,17 @@ public class Plane : MonoBehaviour {
         {
             clientSocket.EndConnect(result);
             Debug.Log("Connected to server");
-
-            // 로그인 요청 보내기
-            var loginMessage = new C_LOGIN();
-            SendToServer(loginMessage);
+            if (serverConnected)
+            {
+                // 로그인 요청 보내기
+                var loginMessage = new C_ENTER_GAME()
+                {
+                    PlayerIndex = 1
+                };
+                SendToServer(loginMessage, PacketType.PKT_C_ENTER_GAME);
+                StartReceive();
+            }
+        
         }
         catch (Exception e)
         {
@@ -714,133 +726,55 @@ public class Plane : MonoBehaviour {
         }
     }
 
-    private void ReceiveCallback(IAsyncResult ar)
+    private void StartReceive()
+    {
+        // 이미 서버에 연결되어 있는 경우 추가적인 연결 시도를 하지 않음
+        if (!serverConnected)
+        {
+            Debug.LogWarning("Cannot start receiving data. Server is not connected.");
+            return;
+        }
+
+        byte[] buffer = new byte[1024]; // 적절한 버퍼 크기를 정의해야 합니다.
+        clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallback, buffer);
+    }
+
+    private void ReceiveCallback(IAsyncResult result)
     {
         try
         {
-            int receivedBytes = clientSocket.EndReceive(ar);
+            int bytesRead = clientSocket.EndReceive(result);
 
-            if (receivedBytes > 0)
+            if (bytesRead > 0)
             {
-                // 받은 데이터를 처리
-                byte[] receivedData = new byte[receivedBytes];
-                Array.Copy(receiveBuffer, receivedData, receivedBytes);
+                byte[] receivedData = (byte[])result.AsyncState;
 
-                // 서버로부터 받은 메시지 처리
-                ProcessReceivedMessage(receivedData);
+                // 서버로부터 받은 데이터를 처리
+                packetManager.OnRecv(receivedData, bytesRead);
 
-                // 다시 서버로부터 데이터를 비동기적으로 수신하기 위해 BeginReceive 메서드 호출
-                clientSocket.BeginReceive(receiveBuffer, 0, receiveBuffer.Length, SocketFlags.None, new AsyncCallback(ReceiveCallback), null);
+                // 추가적인 데이터 수신을 위해 다시 BeginReceive 호출
+                clientSocket.BeginReceive(receivedData, 0, receivedData.Length, SocketFlags.None, ReceiveCallback, receivedData);
+            }
+            else
+            {
+                // 연결이 끊겼거나 데이터가 없는 경우 처리할 작업을 여기에 추가
+                Debug.Log("Connection closed or no data received from server.");
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Debug.LogError($"Error: {ex.Message}");
+            Debug.LogError($"Failed to receive data: {e.Message}");
         }
     }
 
-    private void ProcessReceivedMessage(byte[] data)
-    {
-        // 받은 데이터를 메시지 객체로 파싱
-        IMessage message = ParseMessage(data);
-
-        // 메시지 타입에 따라 처리
-        if (message is S_LOGIN)
-        {
-            HandleLoginResponse((S_LOGIN)message);
-        }
-        else if (message is S_ENTER_GAME)
-        {
-            HandleEnterGameResponse((S_ENTER_GAME)message);
-        }
-        else if (message is S_CHAT)
-        {
-            HandleChatResponse((S_CHAT)message);
-        }
-        // 추가적인 메시지 타입에 대한 처리도 가능
-    }
-
-    private IMessage ParseMessage(byte[] data)
-    {
-        try
-        {
-            // 받은 데이터를 S_LOGIN 메시지로 파싱
-            S_LOGIN loginMessage = S_LOGIN.Parser.ParseFrom(data);
-            return loginMessage; // 파싱된 메시지 객체 반환
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to parse message: {ex.Message}");
-            return null;
-        }
-    }
-    private void HandleLoginResponse(S_LOGIN message)
-    {
-        // 로그인 응답 처리
-        if (message.Success)
-        {
-            Debug.Log("Login successful");
-            // 플레이어 아이디 저장
-            playerId = message.Players[0].Id;
-            // 방에 입장 요청 보내기
-            var enterGameMessage = new C_ENTER_GAME { PlayerIndex = playerId };
-            SendToServer(enterGameMessage);
-        }
-        else
-        {
-            Debug.LogError("Login failed");
-        }
-    }
-
-    private void HandleEnterGameResponse(S_ENTER_GAME message)
-    {
-        // 방 입장 응답 처리
-        if (message.Success)
-        {
-            Debug.Log("Entered game successfully");
-            // 채팅 메시지 보내기
-            var chatMessage = new C_CHAT { Msg = "Hello, world!" };
-            SendToServer(chatMessage);
-        }
-        else
-        {
-            Debug.LogError("Failed to enter game");
-        }
-    }
-
-    private void HandleChatResponse(S_CHAT message)
-    {
-        // 채팅 응답 처리
-        Debug.Log($"Received chat message from player {message.PlayerId}: {message.Msg}");
-    }
 
 
-    private void SendToServer(IMessage message)
+
+    private void SendToServer(IMessage message, PacketType type)
     {
         // 메시지를 직렬화하여 패킷에 헤더를 추가하고 서버로 전송
-        byte[] serializedData = SerializeWithHeader(message);
+        byte[] serializedData = packetManager.SerializeWithHeader(message, type);
         SendMessage(serializedData);
-    }
-
-    private byte[] SerializeWithHeader(IMessage message)
-    {
-        // 메시지를 직렬화하여 데이터를 얻음
-        byte[] messageData = message.ToByteArray();
-
-        // 헤더를 생성하고 헤더와 메시지 데이터의 길이를 계산
-        PacketHeader header = new PacketHeader
-        {
-            size = (ushort)(sizeof(ushort) * 2 + messageData.Length), // 패킷 길이 = 헤더 길이(ushort 2개) + 메시지 데이터 길이
-            id = 1004 // 패킷 ID 등 필요한 정보를 여기에 추가
-        };
-
-        // 헤더와 메시지 데이터를 합쳐서 패킷을 생성
-        byte[] packet = new byte[sizeof(ushort) * 2 + messageData.Length];
-        Buffer.BlockCopy(BitConverter.GetBytes(header.size), 0, packet, 0, sizeof(ushort));
-        Buffer.BlockCopy(BitConverter.GetBytes(header.id), 0, packet, sizeof(ushort), sizeof(ushort));
-        Buffer.BlockCopy(messageData, 0, packet, sizeof(ushort) * 2, messageData.Length);
-
-        return packet;
     }
 
     private void SendMessage(byte[] data)
@@ -888,4 +822,3 @@ public class Plane : MonoBehaviour {
 
 
 }
-
