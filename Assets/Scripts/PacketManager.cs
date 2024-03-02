@@ -1,11 +1,32 @@
 using Google.Protobuf;
+using Protocol;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+
+public interface IPacketHandler
+{
+    void HandlePacket(byte[] packetBody);
+}
+
+public class S_LOGIN_Handler : IPacketHandler
+{
+    public void HandlePacket(byte[] packetBody)
+    {
+        S_LOGIN loginPacket = S_LOGIN.Parser.ParseFrom(packetBody);
+        Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
+    }
+}
+
 
 public class PacketManager : MonoBehaviour
 {
+    private readonly Dictionary<PacketType, IPacketHandler> packetHandlers = new Dictionary<PacketType, IPacketHandler>();
+
     public void OnRecv(byte[] buffer, int len)
     {
+        OnPacketSetting();
         int processLen = 0;
         while (true)
         {
@@ -31,42 +52,26 @@ public class PacketManager : MonoBehaviour
 
             processLen += packetSize;
         }
+    } // 초기화
+    private void OnPacketSetting()
+    {
+        // 각 패킷 유형에 대한 처리기를 매핑
+        packetHandlers.Add(PacketType.PKT_S_LOGIN, new S_LOGIN_Handler());
+
     }
 
 
     protected virtual void OnRecvPacket(ushort packetId, byte[] packetBody)
     {
-        // 패킷 ID에 따라서 처리할 작업을 수행
-        switch ((PacketType)packetId)
+
+        // 패킷 ID에 해당하는 처리기를 찾아서 실행
+        if (packetHandlers.ContainsKey((PacketType)packetId))
         {
-            case PacketType.PKT_C_LOGIN:
-                // PKT_C_LOGIN 패킷 처리
-                Debug.Log("Received PKT_C_LOGIN packet");
-                break;
-            case PacketType.PKT_S_LOGIN:
-                // PKT_S_LOGIN 패킷 처리
-                Debug.Log("Received PKT_S_LOGIN packet");
-                break;
-            case PacketType.PKT_C_ENTER_GAME:
-                // PKT_C_ENTER_GAME 패킷 처리
-                Debug.Log("Received PKT_C_ENTER_GAME packet");
-                break;
-            case PacketType.PKT_S_ENTER_GAME:
-                // PKT_S_ENTER_GAME 패킷 처리
-                Debug.Log("Received PKT_S_ENTER_GAME packet");
-                break;
-            case PacketType.PKT_C_CHAT:
-                // PKT_C_CHAT 패킷 처리
-                Debug.Log("Received PKT_C_CHAT packet");
-                break;
-            case PacketType.PKT_S_CHAT:
-                // PKT_S_CHAT 패킷 처리
-                Debug.Log("Received PKT_S_CHAT packet");
-                break;
-            default:
-                // 정의되지 않은 패킷 처리
-                Debug.LogWarning("Received unknown packet with ID: " + packetId);
-                break;
+            packetHandlers[(PacketType)packetId].HandlePacket(packetBody);
+        }
+        else
+        {
+            Debug.LogWarning("Received unknown packet with ID: " + packetId);
         }
     }
 

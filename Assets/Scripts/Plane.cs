@@ -216,10 +216,32 @@ public class Plane : MonoBehaviour {
         }
     }
 
+    private static Plane instance;
+    public static Plane Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<Plane>();
+            }
+            return instance;
+        }
+    }
+
+
     void Awake()
     {
-        packetManager = gameObject.AddComponent<PacketManager>(); 
-        IOCPServerConnect(); 
+        if (instance == null)
+        {
+            instance = this;
+            packetManager = gameObject.AddComponent<PacketManager>();
+            IOCPServerConnect();
+        }
+        else
+        {
+            // Destroy(gameObject); // 다른 오브젝트는 파괴
+        }
 
     }
 
@@ -711,11 +733,14 @@ public class Plane : MonoBehaviour {
             if (serverConnected)
             {
                 // 로그인 요청 보내기
-                var loginMessage = new C_ENTER_GAME()
+
+                var loginMessage = new C_LOGIN();
+                var enterMessage = new C_ENTER_GAME()
                 {
-                    PlayerIndex = 1
+                    PlayerIndex = 0
                 };
-                SendToServer(loginMessage, PacketType.PKT_C_ENTER_GAME);
+                SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
+                SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
                 StartReceive();
             }
         
