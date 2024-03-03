@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using PimDeWitte.UnityMainThreadDispatcher;
 using Protocol;
 using System;
 using System.Collections.Generic;
@@ -21,8 +22,11 @@ public class S_LOGIN_Handler : IPacketHandler
             foreach (var player in loginPacket.Players)
             {
                 PlayerManager.Instance.AddPlayer((int)player.Id, player.Name);
-                UnityMainThreadDispatcher.Enqueue(() => Plane.Instance.SpawnF15(player.Name));
-    
+                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                {
+                    Plane.Instance.SpawnF15(player.Name);
+                });
+            
 
             }
         }

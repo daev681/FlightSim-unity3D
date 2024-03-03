@@ -6,7 +6,7 @@ using System.Text;
 using UnityEngine;
 using UnityEditor;
 using Google.Protobuf;
-
+using PimDeWitte.UnityMainThreadDispatcher;
 using System.Reflection;
 using Protocol;
 
@@ -283,6 +283,11 @@ public class Plane : MonoBehaviour {
         {
             // 프리팹 복제
             GameObject newF15 = Instantiate(f15Prefab);
+            AIController script = newF15.GetComponent<AIController>();
+            if (script != null)
+            {
+                script.enabled = false;
+            }
 
             // 복제된 오브젝트 이름 변경
             newF15.name = nickName;
@@ -782,10 +787,13 @@ public class Plane : MonoBehaviour {
                 byte[] receivedData = (byte[])result.AsyncState;
 
                 // 서버로부터 받은 데이터를 처리
-                UnityMainThreadDispatcher.Enqueue(() => packetManager.OnRecv(receivedData, bytesRead));
-
+              
+              
+                    packetManager.OnRecv(receivedData, bytesRead);
+                    clientSocket.BeginReceive(receivedData, 0, receivedData.Length, SocketFlags.None, ReceiveCallback, receivedData);
+              
                 // 추가적인 데이터 수신을 위해 다시 BeginReceive 호출
-                clientSocket.BeginReceive(receivedData, 0, receivedData.Length, SocketFlags.None, ReceiveCallback, receivedData);
+            
             }
             else
             {
