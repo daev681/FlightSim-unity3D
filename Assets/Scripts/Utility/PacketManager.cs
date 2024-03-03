@@ -22,12 +22,15 @@ public class S_LOGIN_Handler : IPacketHandler
         {
             foreach (var player in loginPacket.Players)
             {
+
                 PlayerManager.Instance.AddPlayer((int)player.Id, player.Name);
-                UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                // 모든 플레이어를 추가한 후에 현재 플레이어 설정
+                if (loginPacket.Players.Count > 0)
                 {
-                    Plane.Instance.SpawnF15((int)player.Id,player.Name);
-                });
-            
+                    var firstPlayer = loginPacket.Players[0];
+                    PlayerManager.Instance.SetCurrentPlayer(new Player((int)firstPlayer.Id, firstPlayer.Name));
+                }
+
 
             }
         }

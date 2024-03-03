@@ -136,20 +136,11 @@ public class Plane : MonoBehaviour {
     float cannonDebounceTimer;
     float cannonFiringTimer;
 
-    private Socket clientSocket;
-    private byte[] receiveBuffer = new byte[1024];
-    private bool serverConnected = false;
-
 
     private NetworkManager networkManager;
     private PacketManager packetManager;
     private PlayerManager playerManager;
 
-    // 메시지 타입에 대한 딕셔너리 생성
-    private static Dictionary<string, MethodInfo> messageMethods = new Dictionary<string, MethodInfo>();
-
-    //
-    private ulong playerId;
 
     public float MaxHealth {
         get {
@@ -231,17 +222,20 @@ public class Plane : MonoBehaviour {
         }
     }
 
+    bool connected = false;
 
     void Awake()
     {
       
         if (instance == null)
         {
+          
             instance = this;
             playerManager = PlayerManager.Instance;
             packetManager = PacketManager.Instance;
             networkManager = NetworkManager.Instance;
             NetworkManager.Instance.ConnectToServer();
+
         }
         else
         {
@@ -298,9 +292,6 @@ public class Plane : MonoBehaviour {
             // 새로운 위치 및 회전으로 이동
             newF15.transform.position = new Vector3(UnityEngine.Random.Range(-2300f, -2500f), UnityEngine.Random.Range(0f, 150f), UnityEngine.Random.Range(-2300f, -2500f));
             newF15.transform.rotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
-
-            // 플레이어 업데이트
-            PlayerManager.Instance.UpdatePlayerPosition(playerId ,newF15);
 
         }
         else
@@ -678,8 +669,11 @@ public class Plane : MonoBehaviour {
         //Debug.Log("transform.position"+  transform.position);
         // EnumMessage 클래스 사용 예시
 
-
-       
+        if (PlayerManager.Instance.GetCurrentPlayer().isLogin == 1)
+        {
+            PlayerManager.Instance.GetCurrentPlayer().SetPosition(transform.position);
+            PlayerManager.Instance.UpdatePlayerPosition(PlayerManager.Instance.GetCurrentPlayer().playerId);
+        }
 
 
     }

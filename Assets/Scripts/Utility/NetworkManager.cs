@@ -4,11 +4,12 @@ using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
 
-public class NetworkManager : MonoBehaviour
+public class NetworkManager
 {
     private static NetworkManager instance;
     private Socket serverSocket { get; set; }
     private bool serverConnected = false;
+    private NetworkManager() { }
 
     public static NetworkManager Instance
     {
@@ -16,9 +17,8 @@ public class NetworkManager : MonoBehaviour
         {
             if (instance == null)
             {
-                GameObject networkManagerObject = new GameObject("NetworkManager");
-                instance = networkManagerObject.AddComponent<NetworkManager>();
-                DontDestroyOnLoad(networkManagerObject);
+                instance = new NetworkManager();
+
             }
             return instance;
         }
@@ -30,16 +30,6 @@ public class NetworkManager : MonoBehaviour
         return serverSocket;
     }
 
-    private void Awake()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(this.gameObject);
-            return;
-        }
-        instance = this;
-        DontDestroyOnLoad(this.gameObject);
-    }
 
 
     public void ConnectToServer()
@@ -71,7 +61,6 @@ public class NetworkManager : MonoBehaviour
             serverSocket.EndConnect(result);
             Debug.Log("Connected to server");
             serverConnected = true;
-
             // 로그인 요청 보내기
             for (int i = 0; i < 3; i++)
             {

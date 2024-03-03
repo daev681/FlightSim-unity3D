@@ -7,6 +7,7 @@ public class PlayerManager
     private static PlayerManager instance;
     private Dictionary<int, Player> players = new Dictionary<int, Player>();
     private PlayerManager() { }
+    private Player currentPlayer;
 
     public static PlayerManager Instance
     {
@@ -28,6 +29,7 @@ public class PlayerManager
         if (!players.ContainsKey(playerId))
         {
             Player newPlayer = new Player(playerId, playerName);
+            newPlayer.isLogin = 1;
             players.Add(playerId, newPlayer);
         }
         else
@@ -36,29 +38,28 @@ public class PlayerManager
         }
     }
 
-    public Player GetPlayer(int playerId)
+    // 현재 플레이어를 설정하는 메서드
+    public void SetCurrentPlayer(Player player)
     {
-        if (players.ContainsKey(playerId))
-        {
-            return players[playerId];
-        }
-        else
-        {
-            return null; // 플레이어가 존재하지 않을 경우 null 반환
-        }
+        player.isLogin = 1;
+        currentPlayer = player;
     }
 
-    public void UpdatePlayerPosition(int playerId, GameObject playerObject)
+    // 현재 플레이어를 가져오는 메서드
+    public Player GetCurrentPlayer()
+    {
+        return currentPlayer;
+    }
+
+    public void UpdatePlayerPosition(int playerId)
     {
         if (players.ContainsKey(playerId))
         {
             Player player = players[playerId];
-            player.SetPosition(playerObject);
-
             // 패킷 생성
             var playerPositionMessage = new C_POSITION()
             {
-                PlayerId = 0,
+                PlayerId = (ulong)playerId,
                 X = (ulong)player.CurrentPosition.x,
                 Y = (ulong)player.CurrentPosition.y,
                 Z = (ulong)player.CurrentPosition.z
