@@ -271,7 +271,7 @@ public class Plane : MonoBehaviour {
   
     }
 
-    void SpawnF15()
+    public void SpawnF15(String nickName)
     {
         // 프리팹 경로 설정
         string prefabPath = "Assets/Prefabs/F15.prefab";
@@ -285,11 +285,14 @@ public class Plane : MonoBehaviour {
             GameObject newF15 = Instantiate(f15Prefab);
 
             // 복제된 오브젝트 이름 변경
-            newF15.name = "F15(2)";
+            newF15.name = nickName;
 
             // 새로운 위치 및 회전으로 이동
             newF15.transform.position = new Vector3(UnityEngine.Random.Range(-2300f, -2500f), UnityEngine.Random.Range(0f, 150f), UnityEngine.Random.Range(-2300f, -2500f));
             newF15.transform.rotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+
+            // 플레이어 위치 업데이트
+            //UpdatePlayerPosition(newF15.transform.position);
         }
         else
         {
@@ -569,8 +572,6 @@ public class Plane : MonoBehaviour {
         var missileGO = Instantiate(missilePrefab, hardpoint.position, hardpoint.rotation);
         var missile = missileGO.GetComponent<Missile>();
         missile.Launch(this, MissileLocked ? Target : null);
-        SpawnF15();
-
     }
 
     void UpdateWeapons(float dt) {
@@ -781,7 +782,7 @@ public class Plane : MonoBehaviour {
                 byte[] receivedData = (byte[])result.AsyncState;
 
                 // 서버로부터 받은 데이터를 처리
-                packetManager.OnRecv(receivedData, bytesRead);
+                UnityMainThreadDispatcher.Enqueue(() => packetManager.OnRecv(receivedData, bytesRead));
 
                 // 추가적인 데이터 수신을 위해 다시 BeginReceive 호출
                 clientSocket.BeginReceive(receivedData, 0, receivedData.Length, SocketFlags.None, ReceiveCallback, receivedData);

@@ -18,9 +18,40 @@ public class S_LOGIN_Handler : IPacketHandler
         Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
         if (loginPacket.Success)
         {
-            PlayerManager.Instance.AddPlayer((int)loginPacket.Players[0].Id, loginPacket.Players[0].Name);
+            foreach (var player in loginPacket.Players)
+            {
+                PlayerManager.Instance.AddPlayer((int)player.Id, player.Name);
+                UnityMainThreadDispatcher.Enqueue(() => Plane.Instance.SpawnF15(player.Name));
+    
+
+            }
         }
     
+    }
+}
+
+public class S_ENTER_GAME_Handler : IPacketHandler
+{
+    public void HandlePacket(byte[] packetBody)
+    {
+
+        S_ENTER_GAME loginPacket = S_ENTER_GAME.Parser.ParseFrom(packetBody);
+        Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
+        if (loginPacket.Success)
+        {
+           
+        }
+    }
+}
+
+public class S_POSITION_Handler : IPacketHandler
+{
+    public void HandlePacket(byte[] packetBody)
+    {
+        S_POSITION loginPacket = S_POSITION.Parser.ParseFrom(packetBody);
+        Debug.Log("Received S_POSITION_Handler packet: " + loginPacket.ToString());
+
+
     }
 }
 
@@ -29,14 +60,25 @@ public class PacketManager : MonoBehaviour
 {
     private readonly Dictionary<PacketType, IPacketHandler> packetHandlers = new Dictionary<PacketType, IPacketHandler>();
     private static PacketManager instance;
+
+    private void OnPacketSetting()
+    {
+        // 각 패킷 유형에 대한 처리기를 매핑
+        packetHandlers.Add(PacketType.PKT_S_LOGIN, new S_LOGIN_Handler());
+        packetHandlers.Add(PacketType.PKT_S_ENTER_GAME, new S_ENTER_GAME_Handler());
+        packetHandlers.Add(PacketType.PKT_S_POSITION, new S_POSITION_Handler());
+    }
+
+
     public static PacketManager Instance
     {
         get
         {
             if (instance == null)
             {
-                instance = new PacketManager();
-                instance.OnPacketSetting();
+                GameObject packetManagerObject = new GameObject("PacketManager");
+                instance = packetManagerObject.AddComponent<PacketManager>();
+                Instance.OnPacketSetting();
             }
             return instance;
         }
@@ -72,13 +114,7 @@ public class PacketManager : MonoBehaviour
             processLen += packetSize;
         }
     } // 초기화
-    private void OnPacketSetting()
-    {
-        // 각 패킷 유형에 대한 처리기를 매핑
-        packetHandlers.Add(PacketType.PKT_S_LOGIN, new S_LOGIN_Handler());
-
-    }
-
+   
 
     protected virtual void OnRecvPacket(ushort packetId, byte[] packetBody)
     {
