@@ -3,6 +3,7 @@ using PimDeWitte.UnityMainThreadDispatcher;
 using Protocol;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ public class S_LOGIN_Handler : IPacketHandler
                 PlayerManager.Instance.AddPlayer((int)player.Id, player.Name);
                 UnityMainThreadDispatcher.Instance().Enqueue(() =>
                 {
-                    Plane.Instance.SpawnF15(player.Name);
+                    Plane.Instance.SpawnF15((int)player.Id,player.Name);
                 });
             
 
@@ -60,7 +61,7 @@ public class S_POSITION_Handler : IPacketHandler
 }
 
 
-public class PacketManager : MonoBehaviour
+public class PacketManager
 {
     private readonly Dictionary<PacketType, IPacketHandler> packetHandlers = new Dictionary<PacketType, IPacketHandler>();
     private static PacketManager instance;
@@ -80,9 +81,8 @@ public class PacketManager : MonoBehaviour
         {
             if (instance == null)
             {
-                GameObject packetManagerObject = new GameObject("PacketManager");
-                instance = packetManagerObject.AddComponent<PacketManager>();
-                Instance.OnPacketSetting();
+                instance = new PacketManager();
+                instance.OnPacketSetting();
             }
             return instance;
         }
@@ -154,6 +154,43 @@ public class PacketManager : MonoBehaviour
         Buffer.BlockCopy(messageData, 0, packet, sizeof(ushort) * 2, messageData.Length);
 
         return packet;
+    }
+
+    // 패킷을 서버로 전송하는 메서드
+    public void SendToServer(IMessage message, PacketType type)
+    {
+        // 메시지를 직렬화하여 패킷에 헤더를 추가하고 서버로 전송
+        byte[] serializedData = SerializeWithHeader(message, type);
+        SendMessage(serializedData);
+    }
+
+    // 서버로 메시지를 전송하는 메서드
+    private void SendMessage(byte[] data)
+    {
+        try
+        {
+            // 비동기 방식으로 데이터를 보냅니다.
+            NetworkManager.Instance.getServerSocket().BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to send data to server: {e.Message}");
+        }
+    }
+
+    // 메시지 전송이 완료된 후 호출되는 콜백 메서드
+    private void SendCallback(IAsyncResult result)
+    {
+        try
+        {
+            // 비동기 작업을 완료하고 전송된 바이트 수를 반환
+            int sentBytes = NetworkManager.Instance.getServerSocket().EndSend(result);
+            Debug.Log($"Sent {sentBytes} bytes to server");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to send data to server: {e.Message}");
+        }
     }
 }
 

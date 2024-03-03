@@ -140,6 +140,8 @@ public class Plane : MonoBehaviour {
     private byte[] receiveBuffer = new byte[1024];
     private bool serverConnected = false;
 
+
+    private NetworkManager networkManager;
     private PacketManager packetManager;
     private PlayerManager playerManager;
 
@@ -238,7 +240,8 @@ public class Plane : MonoBehaviour {
             instance = this;
             playerManager = PlayerManager.Instance;
             packetManager = PacketManager.Instance;
-            IOCPServerConnect();
+            networkManager = NetworkManager.Instance;
+            NetworkManager.Instance.ConnectToServer();
         }
         else
         {
@@ -271,7 +274,7 @@ public class Plane : MonoBehaviour {
   
     }
 
-    public void SpawnF15(String nickName)
+    public void SpawnF15(int playerId , String nickName)
     {
         // 프리팹 경로 설정
         string prefabPath = "Assets/Prefabs/F15.prefab";
@@ -296,14 +299,18 @@ public class Plane : MonoBehaviour {
             newF15.transform.position = new Vector3(UnityEngine.Random.Range(-2300f, -2500f), UnityEngine.Random.Range(0f, 150f), UnityEngine.Random.Range(-2300f, -2500f));
             newF15.transform.rotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
 
-            // 플레이어 위치 업데이트
-            //UpdatePlayerPosition(newF15.transform.position);
+            // 플레이어 업데이트
+            PlayerManager.Instance.UpdatePlayerPosition(playerId ,newF15);
+
         }
         else
         {
             Debug.LogError("F15Prefab을 로드할 수 없습니다.");
         }
     }
+
+  
+
 
     public void SetThrottleInput(float input) {
         if (Dead) return;
@@ -672,10 +679,7 @@ public class Plane : MonoBehaviour {
         // EnumMessage 클래스 사용 예시
 
 
-        //var loginMessage = new C_CHAT() { 
-        // Msg = "?"
-        //};
-        //SendToServer(loginMessage);
+       
 
 
     }
@@ -710,150 +714,6 @@ public class Plane : MonoBehaviour {
 
 
 
-    private void IOCPServerConnect()
-    {
-        if (serverConnected)
-        {
-            return; // 이미 연결되었으면 중복 호출 방지
-        }
-
-        clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        IPAddress serverIP = IPAddress.Parse("127.0.0.1");
-        IPEndPoint serverEndPoint = new IPEndPoint(serverIP, 7777);
-
-        try
-        {
-            clientSocket.BeginConnect(serverEndPoint, ConnectCallback, null);
-            serverConnected = true; // 연결 후에 상태 업데이트
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to connect to server: {e.Message}");
-        }
-    }
-
-    private void ConnectCallback(IAsyncResult result)
-    {
-        try
-        {
-            clientSocket.EndConnect(result);
-            Debug.Log("Connected to server");
-            if (serverConnected)
-            {
-                // 로그인 요청 보내기
-
-
-                for (int i = 0; i < 3; i++)
-                {
-                    // 로그인 메시지 생성 및 전송
-                    var loginMessage = new C_LOGIN();
-                    SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
-
-                    // 게임 입장 메시지 생성 및 전송
-                    var enterMessage = new C_ENTER_GAME() { PlayerIndex = (ulong)i };
-                    SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
-                }
-                StartReceive();
-            }
-        
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to connect to server: {e.Message}");
-        }
-    }
-
-    private void StartReceive()
-    {
-        // 이미 서버에 연결되어 있는 경우 추가적인 연결 시도를 하지 않음
-        if (!serverConnected)
-        {
-            Debug.LogWarning("Cannot start receiving data. Server is not connected.");
-            return;
-        }
-
-        byte[] buffer = new byte[1024]; // 적절한 버퍼 크기를 정의해야 합니다.
-        clientSocket.BeginReceive(buffer, 0, buffer.Length, SocketFlags.None, ReceiveCallback, buffer);
-    }
-
-    private void ReceiveCallback(IAsyncResult result)
-    {
-        try
-        {
-            int bytesRead = clientSocket.EndReceive(result);
-
-            if (bytesRead > 0)
-            {
-                byte[] receivedData = (byte[])result.AsyncState;
-
-                // 서버로부터 받은 데이터를 처리
-              
-              
-                    packetManager.OnRecv(receivedData, bytesRead);
-                    clientSocket.BeginReceive(receivedData, 0, receivedData.Length, SocketFlags.None, ReceiveCallback, receivedData);
-              
-                // 추가적인 데이터 수신을 위해 다시 BeginReceive 호출
-            
-            }
-            else
-            {
-                // 연결이 끊겼거나 데이터가 없는 경우 처리할 작업을 여기에 추가
-                Debug.Log("Connection closed or no data received from server.");
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to receive data: {e.Message}");
-        }
-    }
-
-
-
-
-    private void SendToServer(IMessage message, PacketType type)
-    {
-        // 메시지를 직렬화하여 패킷에 헤더를 추가하고 서버로 전송
-        byte[] serializedData = packetManager.SerializeWithHeader(message, type);
-        SendMessage(serializedData);
-    }
-
-    private void SendMessage(byte[] data)
-    {
-        try
-        {
-            // 비동기 방식으로 데이터를 보낸다.
-            clientSocket.BeginSend(data, 0, data.Length, SocketFlags.None, SendCallback, null);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to send data to server: {e.Message}");
-        }
-    }
-
-    private void SendCallback(IAsyncResult result)
-    {
-        try
-        {
-            // 비동기 작업을 완료하고 전송된 바이트 수를 반환
-            int sentBytes = clientSocket.EndSend(result);
-            Debug.Log($"Sent {sentBytes} bytes to server");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to send data to server: {e.Message}");
-        }
-    }
-
-
-
-    void OnDestroy()
-    {
-        if (clientSocket != null && clientSocket.Connected)
-        {
-            clientSocket.Shutdown(SocketShutdown.Both);
-            clientSocket.Close();
-        }
-    }
 
    
 
