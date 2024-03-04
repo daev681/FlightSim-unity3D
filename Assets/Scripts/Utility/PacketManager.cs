@@ -21,7 +21,6 @@ public class S_LOGIN_Handler : IPacketHandler
         Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
         if (loginPacket.Success)
         {
-            int index = 0; // 플레이어 인덱스
             foreach (var player in loginPacket.Players)
             {
                 // PlayerManager.Instance.SyncPlayerInfo((int)player.Id, player.Name);
@@ -30,18 +29,21 @@ public class S_LOGIN_Handler : IPacketHandler
                 if (loginPacket.Players.Count > 0)
                 {
                     var me = loginPacket.Players[0];
-                    if (!PlayerManager.Instance.IsPlayerAlreadySpawned((int)me.Id))
+                    if (!PlayerManager.Instance.IsPlayerAlreadySpawned())
                     {
                      
                         // 새로운 플레이어가 접속했을 때만 비행기 생성
-                        PlayerManager.Instance.AddPlayer((int)me.Id, me.Name);
+                  
                         PlayerManager.Instance.SetCurrentPlayer(new Player((int)me.Id, me.Name));
+                        Vector3 currentPosition = new Vector3(0, 450, -2500);
+                        PlayerManager.Instance.AddPlayer((int)me.Id, currentPosition);
+                  
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
                             GameObject playerObject = GameObject.Find("F15");
                             playerObject.name = me.Id.ToString();
                         });
-                        var enterMessage = new C_ENTER_GAME() { Playerindex = 0, PlayerId = (ulong)me.Id };
+                        var enterMessage = new C_ENTER_GAME() { Playerindex = 0, PlayerId = (ulong)me.Id, X = currentPosition.x , Y = currentPosition.y , Z = currentPosition.z };
                         PacketManager.Instance.SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
                     }
                 }
@@ -66,11 +68,11 @@ public class S_ENTER_GAME_Handler : IPacketHandler
             {
                 if (!PlayerManager.Instance.isPlayerById((int)player.Id)) 
                 {
-
-                    PlayerManager.Instance.AddPlayer((int)player.Id, "생성!");
+                    Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
+                    PlayerManager.Instance.AddPlayer((int)player.Id, currentPosition);
                     UnityMainThreadDispatcher.Instance().Enqueue(() =>
                     {             
-                        Plane.Instance.SpawnF15((int)player.Id, "생성!");
+                        Plane.Instance.SpawnF15((int)player.Id, currentPosition);
                     });
 
                 }
@@ -85,24 +87,27 @@ public class S_POSITION_Handler : IPacketHandler
     {
         S_POSITION positionPacket = S_POSITION.Parser.ParseFrom(packetBody);
         Debug.Log("Received S_POSITION_Handler packet: " + positionPacket.ToString());
-        int playerId = (int)positionPacket.PlayerId;
+
+        int receivedPlayerId = (int)positionPacket.PlayerId;
         Vector3 newPosition = new Vector3(positionPacket.X, positionPacket.Y, positionPacket.Z);
-        // 플레이어의 고유한 식별자를 기반으로 해당 플레이어를 찾아 위치를 업데이트
-        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+
+        // 현재 클라이언트의 플레이어 ID와 서버로부터 수신한 플레이어 ID를 비교하여 업데이트할 위치를 결정
+        int currentPlayerId = PlayerManager.Instance.GetCurrentPlayerId();
+        if (currentPlayerId != receivedPlayerId)
         {
-            GameObject playerObject = GameObject.Find(playerId.ToString());
-            if (playerObject != null)
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
             {
-                playerObject.transform.position = newPosition;
-            }
-            else
-            {
-                Debug.LogWarning("Player object not found for player ID: " + playerId);
-            }
-        });
-
-     
-
+                GameObject playerObject = GameObject.Find(receivedPlayerId.ToString());
+                if (playerObject != null)
+                {
+                    playerObject.transform.position = newPosition;
+                }
+                else
+                {
+                    Debug.LogWarning("Player object not found for player ID: " + receivedPlayerId);
+                }
+            });
+        }
     }
 }
 

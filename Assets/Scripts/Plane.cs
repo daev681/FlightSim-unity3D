@@ -143,7 +143,7 @@ public class Plane : MonoBehaviour {
 
     private Player player;
 
-    private float sendInterval = 1.0f; // 위치 정보를 보내는 간격 (예: 1초마다)
+    private float sendInterval = 0.2f; // 위치 정보를 보내는 간격 (예: 1초마다)
     private float timer = 0.0f;
 
     public float MaxHealth {
@@ -225,13 +225,13 @@ public class Plane : MonoBehaviour {
             return instance;
         }
     }
-
+    private Vector3 initialPosition = new Vector3(0f, 800f, -2500f); // 초기 위치
     void Awake()
     {
       
         if (instance == null)
         {
-          
+            transform.position = initialPosition;
             instance = this;
             playerManager = PlayerManager.Instance;
             packetManager = PacketManager.Instance;
@@ -270,7 +270,7 @@ public class Plane : MonoBehaviour {
   
     }
 
-    public void SpawnF15(int playerId , String nickName)
+    public void SpawnF15(int playerId , Vector3 currentPosition)
     {
         // 프리팹 경로 설정
         string prefabPath = "Assets/Prefabs/F15.prefab";
@@ -292,7 +292,14 @@ public class Plane : MonoBehaviour {
             newF15.name = playerId.ToString();
 
             // 새로운 위치 및 회전으로 이동
-            newF15.transform.position = new Vector3(0f, 350f, -2200f);
+     
+             newF15.transform.position = currentPosition;
+             PlayerManager.Instance.UpdateOtherPlayerPosition(playerId,newF15.transform.position);
+
+            
+
+
+            
 
         }
         else
@@ -687,10 +694,10 @@ public class Plane : MonoBehaviour {
         {
             // 서버로 위치 정보 보내기
 
-            if(PlayerManager.Instance.GetCurrentisLogin() == 1)
-            {
-                PlayerManager.Instance.UpdatePlayerPosition(transform.position);
-            }
+         
+            PlayerManager.Instance.UpdatePlayerPosition(transform.position);
+             
+   
             // 타이머 초기화
             timer = 0.0f;
         }
@@ -713,7 +720,7 @@ public class Plane : MonoBehaviour {
             Rigidbody.isKinematic = true;
             Rigidbody.position = contact.point;
             Rigidbody.rotation = Quaternion.Euler(0, Rigidbody.rotation.eulerAngles.y, 0);
-            NetworkManager.Instance.OnDestroy();
+            //NetworkManager.Instance.OnDestroy();
 
             foreach (var go in graphics)
             {

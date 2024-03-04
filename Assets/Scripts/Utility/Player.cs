@@ -10,11 +10,18 @@ public class Player
         this.playerName = playerName;
     }
 
+    public Player(int playerId, Vector3 CurrentPosition)
+    {
+        this.playerId = playerId;
+        this.CurrentPosition = CurrentPosition;
+    }
+
+
     public int isLogin = 0;
     public int playerId { get; private set; }
     public string playerName { get; private set; }
     public bool IsLoggedIn { get; set; }
-    public Vector3 CurrentPosition { get; private set; }
+    public Vector3 CurrentPosition { get; set; }
     public GameObject PlayerObject { get; private set; }
     private Player() { }
 

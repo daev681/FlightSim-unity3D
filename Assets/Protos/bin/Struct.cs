@@ -24,13 +24,14 @@ namespace Protocol {
     static StructReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgxTdHJ1Y3QucHJvdG8SCFByb3RvY29sGgpFbnVtLnByb3RvIkwKBlBsYXll",
+            "CgxTdHJ1Y3QucHJvdG8SCFByb3RvY29sGgpFbnVtLnByb3RvIm0KBlBsYXll",
             "chIKCgJpZBgBIAEoBBIMCgRuYW1lGAIgASgJEigKCnBsYXllclR5cGUYAyAB",
-            "KA4yFC5Qcm90b2NvbC5QbGF5ZXJUeXBlYgZwcm90bzM="));
+            "KA4yFC5Qcm90b2NvbC5QbGF5ZXJUeXBlEgkKAXgYBCABKAISCQoBeRgFIAEo",
+            "AhIJCgF6GAYgASgCYgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Protocol.EnumReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Player), global::Protocol.Player.Parser, new[]{ "Id", "Name", "PlayerType" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.Player), global::Protocol.Player.Parser, new[]{ "Id", "Name", "PlayerType", "X", "Y", "Z" }, null, null, null, null)
           }));
     }
     #endregion
@@ -69,6 +70,9 @@ namespace Protocol {
       id_ = other.id_;
       name_ = other.name_;
       playerType_ = other.playerType_;
+      x_ = other.x_;
+      y_ = other.y_;
+      z_ = other.z_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -102,14 +106,44 @@ namespace Protocol {
     /// <summary>Field number for the "playerType" field.</summary>
     public const int PlayerTypeFieldNumber = 3;
     private global::Protocol.PlayerType playerType_ = global::Protocol.PlayerType.None;
-    /// <summary>
-    /// Ω∫≈» ¡§∫∏...
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public global::Protocol.PlayerType PlayerType {
       get { return playerType_; }
       set {
         playerType_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "x" field.</summary>
+    public const int XFieldNumber = 4;
+    private float x_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float X {
+      get { return x_; }
+      set {
+        x_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "y" field.</summary>
+    public const int YFieldNumber = 5;
+    private float y_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Y {
+      get { return y_; }
+      set {
+        y_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "z" field.</summary>
+    public const int ZFieldNumber = 6;
+    private float z_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Z {
+      get { return z_; }
+      set {
+        z_ = value;
       }
     }
 
@@ -129,6 +163,9 @@ namespace Protocol {
       if (Id != other.Id) return false;
       if (Name != other.Name) return false;
       if (PlayerType != other.PlayerType) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -138,6 +175,9 @@ namespace Protocol {
       if (Id != 0UL) hash ^= Id.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (PlayerType != global::Protocol.PlayerType.None) hash ^= PlayerType.GetHashCode();
+      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
+      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -166,6 +206,18 @@ namespace Protocol {
         output.WriteRawTag(24);
         output.WriteEnum((int) PlayerType);
       }
+      if (X != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(X);
+      }
+      if (Y != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Y);
+      }
+      if (Z != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Z);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -187,6 +239,18 @@ namespace Protocol {
         output.WriteRawTag(24);
         output.WriteEnum((int) PlayerType);
       }
+      if (X != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(X);
+      }
+      if (Y != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Y);
+      }
+      if (Z != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Z);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -204,6 +268,15 @@ namespace Protocol {
       }
       if (PlayerType != global::Protocol.PlayerType.None) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) PlayerType);
+      }
+      if (X != 0F) {
+        size += 1 + 4;
+      }
+      if (Y != 0F) {
+        size += 1 + 4;
+      }
+      if (Z != 0F) {
+        size += 1 + 4;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -224,6 +297,15 @@ namespace Protocol {
       }
       if (other.PlayerType != global::Protocol.PlayerType.None) {
         PlayerType = other.PlayerType;
+      }
+      if (other.X != 0F) {
+        X = other.X;
+      }
+      if (other.Y != 0F) {
+        Y = other.Y;
+      }
+      if (other.Z != 0F) {
+        Z = other.Z;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -251,6 +333,18 @@ namespace Protocol {
             PlayerType = (global::Protocol.PlayerType) input.ReadEnum();
             break;
           }
+          case 37: {
+            X = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Y = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Z = input.ReadFloat();
+            break;
+          }
         }
       }
     #endif
@@ -275,6 +369,18 @@ namespace Protocol {
           }
           case 24: {
             PlayerType = (global::Protocol.PlayerType) input.ReadEnum();
+            break;
+          }
+          case 37: {
+            X = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Y = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Z = input.ReadFloat();
             break;
           }
         }
