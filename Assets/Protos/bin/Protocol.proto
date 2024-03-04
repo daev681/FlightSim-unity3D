@@ -13,16 +13,26 @@ message S_LOGIN
 {
 	bool success = 1;
 	repeated Player players = 2; // 아이디 발급 전
+
 }
 
 message C_ENTER_GAME
 {
-	uint64 playerIndex = 1;
+	uint64 playerindex = 1;
+	uint64 playerId = 2;
+	float x = 3;
+	float y = 4;
+	float z = 5;
 }
 
 message S_ENTER_GAME
 {
 	bool success = 1;
+	uint64 playerId = 2;
+	float x = 3;
+	float y = 4;
+	float z = 5;
+	repeated Player currentAllplayers = 6;  //  현재 접속한 사용자 
 }
 
 message C_CHAT
@@ -66,4 +76,15 @@ message S_MISSILE
 	float x = 2;
 	float y = 3;
 	float z = 4;
+}
+
+message C_DESTORY
+{
+	uint64 playerId = 1;
+}
+
+message S_DESTORY
+{
+	uint64 playerId = 1;
+	uint64 success = 2;
 }

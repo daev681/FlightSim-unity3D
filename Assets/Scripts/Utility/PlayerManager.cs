@@ -5,7 +5,7 @@ using Protocol;
 public class PlayerManager
 {
     private static PlayerManager instance;
-    private Dictionary<int, Player> players = new Dictionary<int, Player>();
+    private static Dictionary<int, Player> players = new Dictionary<int, Player>();
     private PlayerManager() { }
     private Player currentPlayer;
 
@@ -21,6 +21,13 @@ public class PlayerManager
         }
     }
 
+    // 딕셔너리를 초기화하는 메서드
+    public void ClearPlayers()
+    {
+        players.Clear();
+    }
+
+
 
 
     public void AddPlayer(int playerId, string playerName)
@@ -35,6 +42,18 @@ public class PlayerManager
         else
         {
 
+        }
+    }
+
+    public bool isPlayerById(int playerId)
+    {
+        if (players.ContainsKey(playerId))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
@@ -60,13 +79,12 @@ public class PlayerManager
     // 해당 플레이어의 비행기가 이미 생성되어 있는지 여부를 확인하는 메서드
     public bool IsPlayerAlreadySpawned(int playerId)
     {
-        return currentPlayer != null && currentPlayer.playerId == playerId;
+        return currentPlayer == null ? false : false;
     }
 
-  
 
 
-    public void UpdatePlayerPosition(Vector3 position) 
+        public void UpdatePlayerPosition(Vector3 position) 
     {
         if (players.ContainsKey(currentPlayer.playerId) && currentPlayer.isLogin == 1)
         {

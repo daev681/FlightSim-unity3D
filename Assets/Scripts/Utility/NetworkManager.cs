@@ -67,8 +67,7 @@ public class NetworkManager
                 var loginMessage = new C_LOGIN();
                 PacketManager.Instance.SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
 
-                var enterMessage = new C_ENTER_GAME() { PlayerIndex = (ulong)0 };
-                PacketManager.Instance.SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
+
             }
 
             StartReceive();
@@ -116,10 +115,11 @@ public class NetworkManager
         }
     }
 
-    private void OnDestroy()
+    public void OnDestroy()
     {
         if (serverSocket != null && serverSocket.Connected)
         {
+            PlayerManager.Instance.ClearPlayers();
             serverSocket.Shutdown(SocketShutdown.Both);
             serverSocket.Close();
         }

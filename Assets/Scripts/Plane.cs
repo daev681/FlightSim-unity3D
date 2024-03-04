@@ -713,6 +713,7 @@ public class Plane : MonoBehaviour {
             Rigidbody.isKinematic = true;
             Rigidbody.position = contact.point;
             Rigidbody.rotation = Quaternion.Euler(0, Rigidbody.rotation.eulerAngles.y, 0);
+            NetworkManager.Instance.OnDestroy();
 
             foreach (var go in graphics)
             {

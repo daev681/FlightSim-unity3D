@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public interface IPacketHandler
 {
@@ -20,40 +21,30 @@ public class S_LOGIN_Handler : IPacketHandler
         Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
         if (loginPacket.Success)
         {
+            int index = 0; // 플레이어 인덱스
             foreach (var player in loginPacket.Players)
             {
-
-
-
-                PlayerManager.Instance.AddPlayer((int)player.Id, player.Name);
+                // PlayerManager.Instance.SyncPlayerInfo((int)player.Id, player.Name);
+              
                 // 모든 플레이어를 추가한 후에 현재 플레이어 설정
                 if (loginPacket.Players.Count > 0)
                 {
-                    var firstPlayer = loginPacket.Players[0];
-                    // 새로운 플레이어가 접속했을 때만 비행기 생성
-                    if (PlayerManager.Instance.IsPlayerAlreadySpawned((int)player.Id))
+                    var me = loginPacket.Players[0];
+                    if (!PlayerManager.Instance.IsPlayerAlreadySpawned((int)me.Id))
                     {
-                        UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                        {
-                            Plane.Instance.SpawnF15((int)player.Id, player.Name);
-                        });
-               
-                    }
-                    else
-                    {
-                        PlayerManager.Instance.SetCurrentPlayer(new Player((int)firstPlayer.Id, firstPlayer.Name));
+                     
+                        // 새로운 플레이어가 접속했을 때만 비행기 생성
+                        PlayerManager.Instance.AddPlayer((int)me.Id, me.Name);
+                        PlayerManager.Instance.SetCurrentPlayer(new Player((int)me.Id, me.Name));
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
                             GameObject playerObject = GameObject.Find("F15");
-                            playerObject.name = firstPlayer.Id.ToString();
+                            playerObject.name = me.Id.ToString();
                         });
-
-                 
-
+                        var enterMessage = new C_ENTER_GAME() { Playerindex = 0, PlayerId = (ulong)me.Id };
+                        PacketManager.Instance.SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
                     }
                 }
-
-
             }
         }
     
@@ -65,11 +56,25 @@ public class S_ENTER_GAME_Handler : IPacketHandler
     public void HandlePacket(byte[] packetBody)
     {
 
-        S_ENTER_GAME loginPacket = S_ENTER_GAME.Parser.ParseFrom(packetBody);
-        Debug.Log("Received PKT_S_LOGIN packet: " + loginPacket.ToString());
-        if (loginPacket.Success)
+        S_ENTER_GAME enterPacket = S_ENTER_GAME.Parser.ParseFrom(packetBody);
+        Debug.Log("Received PKT_S_LOGIN packet: " + enterPacket.ToString());
+     
+        if (enterPacket.Success)
         {
-           
+
+            foreach (var player in enterPacket.CurrentAllplayers)
+            {
+                if (!PlayerManager.Instance.isPlayerById((int)player.Id)) 
+                {
+
+                    PlayerManager.Instance.AddPlayer((int)player.Id, "생성!");
+                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                    {             
+                        Plane.Instance.SpawnF15((int)player.Id, "생성!");
+                    });
+
+                }
+            }
         }
     }
 }
