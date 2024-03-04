@@ -30,12 +30,12 @@ namespace Protocol {
             "RVJfR0FNRRITCgtwbGF5ZXJJbmRleBgBIAEoBCIfCgxTX0VOVEVSX0dBTUUS",
             "DwoHc3VjY2VzcxgBIAEoCCIVCgZDX0NIQVQSCwoDbXNnGAEgASgJIicKBlNf",
             "Q0hBVBIQCghwbGF5ZXJJZBgBIAEoBBILCgNtc2cYAiABKAkiPwoKQ19QT1NJ",
-            "VElPThIQCghwbGF5ZXJJZBgBIAEoBBIJCgF4GAIgASgEEgkKAXkYAyABKAQS",
-            "CQoBehgEIAEoBCI/CgpTX1BPU0lUSU9OEhAKCHBsYXllcklkGAEgASgEEgkK",
-            "AXgYAiABKAQSCQoBeRgDIAEoBBIJCgF6GAQgASgEIj4KCUNfTUlTU0lMRRIQ",
-            "CghwbGF5ZXJJZBgBIAEoBBIJCgF4GAIgASgEEgkKAXkYAyABKAQSCQoBehgE",
-            "IAEoBCI+CglTX01JU1NJTEUSEAoIcGxheWVySWQYASABKAQSCQoBeBgCIAEo",
-            "BBIJCgF5GAMgASgEEgkKAXoYBCABKARiBnByb3RvMw=="));
+            "VElPThIQCghwbGF5ZXJJZBgBIAEoBBIJCgF4GAIgASgCEgkKAXkYAyABKAIS",
+            "CQoBehgEIAEoAiI/CgpTX1BPU0lUSU9OEhAKCHBsYXllcklkGAEgASgEEgkK",
+            "AXgYAiABKAISCQoBeRgDIAEoAhIJCgF6GAQgASgCIj4KCUNfTUlTU0lMRRIQ",
+            "CghwbGF5ZXJJZBgBIAEoBBIJCgF4GAIgASgCEgkKAXkYAyABKAISCQoBehgE",
+            "IAEoAiI+CglTX01JU1NJTEUSEAoIcGxheWVySWQYASABKAQSCQoBeBgCIAEo",
+            "AhIJCgF5GAMgASgCEgkKAXoYBCABKAJiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Protocol.EnumReflection.Descriptor, global::Protocol.StructReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -1169,9 +1169,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "x" field.</summary>
     public const int XFieldNumber = 2;
-    private ulong x_;
+    private float x_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong X {
+    public float X {
       get { return x_; }
       set {
         x_ = value;
@@ -1180,9 +1180,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "y" field.</summary>
     public const int YFieldNumber = 3;
-    private ulong y_;
+    private float y_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Y {
+    public float Y {
       get { return y_; }
       set {
         y_ = value;
@@ -1191,9 +1191,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "z" field.</summary>
     public const int ZFieldNumber = 4;
-    private ulong z_;
+    private float z_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Z {
+    public float Z {
       get { return z_; }
       set {
         z_ = value;
@@ -1214,9 +1214,9 @@ namespace Protocol {
         return true;
       }
       if (PlayerId != other.PlayerId) return false;
-      if (X != other.X) return false;
-      if (Y != other.Y) return false;
-      if (Z != other.Z) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1224,9 +1224,9 @@ namespace Protocol {
     public override int GetHashCode() {
       int hash = 1;
       if (PlayerId != 0UL) hash ^= PlayerId.GetHashCode();
-      if (X != 0UL) hash ^= X.GetHashCode();
-      if (Y != 0UL) hash ^= Y.GetHashCode();
-      if (Z != 0UL) hash ^= Z.GetHashCode();
+      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
+      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1247,17 +1247,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1272,17 +1272,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1296,14 +1296,14 @@ namespace Protocol {
       if (PlayerId != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PlayerId);
       }
-      if (X != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(X);
+      if (X != 0F) {
+        size += 1 + 4;
       }
-      if (Y != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Y);
+      if (Y != 0F) {
+        size += 1 + 4;
       }
-      if (Z != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Z);
+      if (Z != 0F) {
+        size += 1 + 4;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1319,13 +1319,13 @@ namespace Protocol {
       if (other.PlayerId != 0UL) {
         PlayerId = other.PlayerId;
       }
-      if (other.X != 0UL) {
+      if (other.X != 0F) {
         X = other.X;
       }
-      if (other.Y != 0UL) {
+      if (other.Y != 0F) {
         Y = other.Y;
       }
-      if (other.Z != 0UL) {
+      if (other.Z != 0F) {
         Z = other.Z;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -1346,16 +1346,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -1376,16 +1376,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -1449,9 +1449,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "x" field.</summary>
     public const int XFieldNumber = 2;
-    private ulong x_;
+    private float x_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong X {
+    public float X {
       get { return x_; }
       set {
         x_ = value;
@@ -1460,9 +1460,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "y" field.</summary>
     public const int YFieldNumber = 3;
-    private ulong y_;
+    private float y_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Y {
+    public float Y {
       get { return y_; }
       set {
         y_ = value;
@@ -1471,9 +1471,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "z" field.</summary>
     public const int ZFieldNumber = 4;
-    private ulong z_;
+    private float z_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Z {
+    public float Z {
       get { return z_; }
       set {
         z_ = value;
@@ -1494,9 +1494,9 @@ namespace Protocol {
         return true;
       }
       if (PlayerId != other.PlayerId) return false;
-      if (X != other.X) return false;
-      if (Y != other.Y) return false;
-      if (Z != other.Z) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1504,9 +1504,9 @@ namespace Protocol {
     public override int GetHashCode() {
       int hash = 1;
       if (PlayerId != 0UL) hash ^= PlayerId.GetHashCode();
-      if (X != 0UL) hash ^= X.GetHashCode();
-      if (Y != 0UL) hash ^= Y.GetHashCode();
-      if (Z != 0UL) hash ^= Z.GetHashCode();
+      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
+      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1527,17 +1527,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1552,17 +1552,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1576,14 +1576,14 @@ namespace Protocol {
       if (PlayerId != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PlayerId);
       }
-      if (X != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(X);
+      if (X != 0F) {
+        size += 1 + 4;
       }
-      if (Y != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Y);
+      if (Y != 0F) {
+        size += 1 + 4;
       }
-      if (Z != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Z);
+      if (Z != 0F) {
+        size += 1 + 4;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1599,13 +1599,13 @@ namespace Protocol {
       if (other.PlayerId != 0UL) {
         PlayerId = other.PlayerId;
       }
-      if (other.X != 0UL) {
+      if (other.X != 0F) {
         X = other.X;
       }
-      if (other.Y != 0UL) {
+      if (other.Y != 0F) {
         Y = other.Y;
       }
-      if (other.Z != 0UL) {
+      if (other.Z != 0F) {
         Z = other.Z;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -1626,16 +1626,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -1656,16 +1656,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -1729,9 +1729,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "x" field.</summary>
     public const int XFieldNumber = 2;
-    private ulong x_;
+    private float x_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong X {
+    public float X {
       get { return x_; }
       set {
         x_ = value;
@@ -1740,9 +1740,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "y" field.</summary>
     public const int YFieldNumber = 3;
-    private ulong y_;
+    private float y_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Y {
+    public float Y {
       get { return y_; }
       set {
         y_ = value;
@@ -1751,9 +1751,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "z" field.</summary>
     public const int ZFieldNumber = 4;
-    private ulong z_;
+    private float z_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Z {
+    public float Z {
       get { return z_; }
       set {
         z_ = value;
@@ -1774,9 +1774,9 @@ namespace Protocol {
         return true;
       }
       if (PlayerId != other.PlayerId) return false;
-      if (X != other.X) return false;
-      if (Y != other.Y) return false;
-      if (Z != other.Z) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1784,9 +1784,9 @@ namespace Protocol {
     public override int GetHashCode() {
       int hash = 1;
       if (PlayerId != 0UL) hash ^= PlayerId.GetHashCode();
-      if (X != 0UL) hash ^= X.GetHashCode();
-      if (Y != 0UL) hash ^= Y.GetHashCode();
-      if (Z != 0UL) hash ^= Z.GetHashCode();
+      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
+      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1807,17 +1807,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1832,17 +1832,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1856,14 +1856,14 @@ namespace Protocol {
       if (PlayerId != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PlayerId);
       }
-      if (X != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(X);
+      if (X != 0F) {
+        size += 1 + 4;
       }
-      if (Y != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Y);
+      if (Y != 0F) {
+        size += 1 + 4;
       }
-      if (Z != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Z);
+      if (Z != 0F) {
+        size += 1 + 4;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1879,13 +1879,13 @@ namespace Protocol {
       if (other.PlayerId != 0UL) {
         PlayerId = other.PlayerId;
       }
-      if (other.X != 0UL) {
+      if (other.X != 0F) {
         X = other.X;
       }
-      if (other.Y != 0UL) {
+      if (other.Y != 0F) {
         Y = other.Y;
       }
-      if (other.Z != 0UL) {
+      if (other.Z != 0F) {
         Z = other.Z;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -1906,16 +1906,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -1936,16 +1936,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -2009,9 +2009,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "x" field.</summary>
     public const int XFieldNumber = 2;
-    private ulong x_;
+    private float x_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong X {
+    public float X {
       get { return x_; }
       set {
         x_ = value;
@@ -2020,9 +2020,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "y" field.</summary>
     public const int YFieldNumber = 3;
-    private ulong y_;
+    private float y_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Y {
+    public float Y {
       get { return y_; }
       set {
         y_ = value;
@@ -2031,9 +2031,9 @@ namespace Protocol {
 
     /// <summary>Field number for the "z" field.</summary>
     public const int ZFieldNumber = 4;
-    private ulong z_;
+    private float z_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public ulong Z {
+    public float Z {
       get { return z_; }
       set {
         z_ = value;
@@ -2054,9 +2054,9 @@ namespace Protocol {
         return true;
       }
       if (PlayerId != other.PlayerId) return false;
-      if (X != other.X) return false;
-      if (Y != other.Y) return false;
-      if (Z != other.Z) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2064,9 +2064,9 @@ namespace Protocol {
     public override int GetHashCode() {
       int hash = 1;
       if (PlayerId != 0UL) hash ^= PlayerId.GetHashCode();
-      if (X != 0UL) hash ^= X.GetHashCode();
-      if (Y != 0UL) hash ^= Y.GetHashCode();
-      if (Z != 0UL) hash ^= Z.GetHashCode();
+      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
+      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2087,17 +2087,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -2112,17 +2112,17 @@ namespace Protocol {
         output.WriteRawTag(8);
         output.WriteUInt64(PlayerId);
       }
-      if (X != 0UL) {
-        output.WriteRawTag(16);
-        output.WriteUInt64(X);
+      if (X != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(X);
       }
-      if (Y != 0UL) {
-        output.WriteRawTag(24);
-        output.WriteUInt64(Y);
+      if (Y != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Y);
       }
-      if (Z != 0UL) {
-        output.WriteRawTag(32);
-        output.WriteUInt64(Z);
+      if (Z != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Z);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -2136,14 +2136,14 @@ namespace Protocol {
       if (PlayerId != 0UL) {
         size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PlayerId);
       }
-      if (X != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(X);
+      if (X != 0F) {
+        size += 1 + 4;
       }
-      if (Y != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Y);
+      if (Y != 0F) {
+        size += 1 + 4;
       }
-      if (Z != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Z);
+      if (Z != 0F) {
+        size += 1 + 4;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2159,13 +2159,13 @@ namespace Protocol {
       if (other.PlayerId != 0UL) {
         PlayerId = other.PlayerId;
       }
-      if (other.X != 0UL) {
+      if (other.X != 0F) {
         X = other.X;
       }
-      if (other.Y != 0UL) {
+      if (other.Y != 0F) {
         Y = other.Y;
       }
-      if (other.Z != 0UL) {
+      if (other.Z != 0F) {
         Z = other.Z;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -2186,16 +2186,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }
@@ -2216,16 +2216,16 @@ namespace Protocol {
             PlayerId = input.ReadUInt64();
             break;
           }
-          case 16: {
-            X = input.ReadUInt64();
+          case 21: {
+            X = input.ReadFloat();
             break;
           }
-          case 24: {
-            Y = input.ReadUInt64();
+          case 29: {
+            Y = input.ReadFloat();
             break;
           }
-          case 32: {
-            Z = input.ReadUInt64();
+          case 37: {
+            Z = input.ReadFloat();
             break;
           }
         }

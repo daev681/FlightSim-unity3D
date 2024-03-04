@@ -51,27 +51,46 @@ public class PlayerManager
         return currentPlayer;
     }
 
-    public void UpdatePlayerPosition(int playerId)
+    // 현재 플레이어를 가져오는 메서드
+    public int GetCurrentisLogin()
     {
-        if (players.ContainsKey(playerId))
+        return currentPlayer.isLogin;
+    }
+
+    // 해당 플레이어의 비행기가 이미 생성되어 있는지 여부를 확인하는 메서드
+    public bool IsPlayerAlreadySpawned(int playerId)
+    {
+        return currentPlayer != null && currentPlayer.playerId == playerId;
+    }
+
+  
+
+
+    public void UpdatePlayerPosition(Vector3 position) 
+    {
+        if (players.ContainsKey(currentPlayer.playerId) && currentPlayer.isLogin == 1)
         {
-            Player player = players[playerId];
+            Player player = players[currentPlayer.playerId];
             // 패킷 생성
             var playerPositionMessage = new C_POSITION()
             {
-                PlayerId = (ulong)playerId,
-                X = (ulong)player.CurrentPosition.x,
-                Y = (ulong)player.CurrentPosition.y,
-                Z = (ulong)player.CurrentPosition.z
+                PlayerId = (ulong)player.playerId,
+                X = position.x,
+                Y = position.y,
+                Z = position.z
             };
 
             // 패킷 서버로 전송
             PacketManager.Instance.SendToServer(playerPositionMessage, PacketType.PKT_C_POSITION);
         }
+        else if (currentPlayer.isLogin == 0)
+        {
+
+           Debug.LogWarning("현재 로그인 된 상태가 아닙니다.");
+        }
         else
         {
-            // 해당 playerId를 가진 플레이어가 존재하지 않음을 알리는 메시지 출력 또는 다른 처리 수행
-            // 예시: Debug.LogWarning("존재하지 않는 플레이어 ID입니다.");
+            Debug.LogWarning("세션에 정상 등록이 되지 않았습니다");
         }
     }
 }

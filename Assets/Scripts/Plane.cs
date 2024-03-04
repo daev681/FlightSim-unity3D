@@ -141,6 +141,10 @@ public class Plane : MonoBehaviour {
     private PacketManager packetManager;
     private PlayerManager playerManager;
 
+    private Player player;
+
+    private float sendInterval = 1.0f; // 위치 정보를 보내는 간격 (예: 1초마다)
+    private float timer = 0.0f;
 
     public float MaxHealth {
         get {
@@ -222,8 +226,6 @@ public class Plane : MonoBehaviour {
         }
     }
 
-    bool connected = false;
-
     void Awake()
     {
       
@@ -287,11 +289,10 @@ public class Plane : MonoBehaviour {
             }
 
             // 복제된 오브젝트 이름 변경
-            newF15.name = nickName;
+            newF15.name = playerId.ToString();
 
             // 새로운 위치 및 회전으로 이동
-            newF15.transform.position = new Vector3(UnityEngine.Random.Range(-2300f, -2500f), UnityEngine.Random.Range(0f, 150f), UnityEngine.Random.Range(-2300f, -2500f));
-            newF15.transform.rotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+            newF15.transform.position = new Vector3(0f, 350f, -2200f);
 
         }
         else
@@ -632,6 +633,8 @@ public class Plane : MonoBehaviour {
 
     void FixedUpdate()
     {
+      
+      
         float dt = Time.fixedDeltaTime;
 
       
@@ -668,16 +671,30 @@ public class Plane : MonoBehaviour {
         UpdateWeapons(dt);
         //Debug.Log("transform.position"+  transform.position);
         // EnumMessage 클래스 사용 예시
-
-        if (PlayerManager.Instance.GetCurrentPlayer().isLogin == 1)
-        {
-            PlayerManager.Instance.GetCurrentPlayer().SetPosition(transform.position);
-            PlayerManager.Instance.UpdatePlayerPosition(PlayerManager.Instance.GetCurrentPlayer().playerId);
-        }
+    
+    
 
 
     }
 
+    private void Update()
+    {
+        // 타이머 업데이트
+        timer += Time.deltaTime;
+
+        // 일정 시간 간격마다 위치 정보를 서버로 보냄
+        if (timer >= sendInterval)
+        {
+            // 서버로 위치 정보 보내기
+
+            if(PlayerManager.Instance.GetCurrentisLogin() == 1)
+            {
+                PlayerManager.Instance.UpdatePlayerPosition(transform.position);
+            }
+            // 타이머 초기화
+            timer = 0.0f;
+        }
+    }
 
 
     void OnCollisionEnter(Collision collision)

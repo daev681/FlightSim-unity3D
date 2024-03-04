@@ -39,31 +39,31 @@ message S_CHAT
 message C_POSITION
 {
 	uint64 playerId = 1;
-	uint64 x = 2;
-	uint64 y = 3;
-	uint64 z = 4;
+	float x = 2;
+	float y = 3;
+	float z = 4;
 }
 
 message S_POSITION
 {
 	uint64 playerId = 1;
-	uint64 x = 2;
-	uint64 y = 3;
-	uint64 z = 4;
+	float x = 2;
+	float y = 3;
+	float z = 4;
 }
 
 message C_MISSILE
 {
 	uint64 playerId = 1;
-	uint64 x = 2;
-	uint64 y = 3;
-	uint64 z = 4;
+	float x = 2;
+	float y = 3;
+	float z = 4;
 }
 
 message S_MISSILE
 {
 	uint64 playerId = 1;
-	uint64 x = 2;
-	uint64 y = 3;
-	uint64 z = 4;
+	float x = 2;
+	float y = 3;
+	float z = 4;
 }

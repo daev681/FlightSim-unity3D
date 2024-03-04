@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 using Protocol;
-
+using PimDeWitte.UnityMainThreadDispatcher;
 public class NetworkManager
 {
     private static NetworkManager instance;
@@ -62,7 +62,7 @@ public class NetworkManager
             Debug.Log("Connected to server");
             serverConnected = true;
             // 로그인 요청 보내기
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var loginMessage = new C_LOGIN();
                 PacketManager.Instance.SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
@@ -100,8 +100,10 @@ public class NetworkManager
             if (bytesRead > 0)
             {
                 byte[] receivedData = (byte[])result.AsyncState;
+           
                 PacketManager.Instance.OnRecv(receivedData, bytesRead);
                 serverSocket.BeginReceive(receivedData, 0, receivedData.Length, SocketFlags.None, ReceiveCallback, receivedData);
+
             }
             else
             {

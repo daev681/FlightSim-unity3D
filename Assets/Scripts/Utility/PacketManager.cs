@@ -23,12 +23,34 @@ public class S_LOGIN_Handler : IPacketHandler
             foreach (var player in loginPacket.Players)
             {
 
+
+
                 PlayerManager.Instance.AddPlayer((int)player.Id, player.Name);
                 // 모든 플레이어를 추가한 후에 현재 플레이어 설정
                 if (loginPacket.Players.Count > 0)
                 {
                     var firstPlayer = loginPacket.Players[0];
-                    PlayerManager.Instance.SetCurrentPlayer(new Player((int)firstPlayer.Id, firstPlayer.Name));
+                    // 새로운 플레이어가 접속했을 때만 비행기 생성
+                    if (PlayerManager.Instance.IsPlayerAlreadySpawned((int)player.Id))
+                    {
+                        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                        {
+                            Plane.Instance.SpawnF15((int)player.Id, player.Name);
+                        });
+               
+                    }
+                    else
+                    {
+                        PlayerManager.Instance.SetCurrentPlayer(new Player((int)firstPlayer.Id, firstPlayer.Name));
+                        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                        {
+                            GameObject playerObject = GameObject.Find("F15");
+                            playerObject.name = firstPlayer.Id.ToString();
+                        });
+
+                 
+
+                    }
                 }
 
 
@@ -56,9 +78,25 @@ public class S_POSITION_Handler : IPacketHandler
 {
     public void HandlePacket(byte[] packetBody)
     {
-        S_POSITION loginPacket = S_POSITION.Parser.ParseFrom(packetBody);
-        Debug.Log("Received S_POSITION_Handler packet: " + loginPacket.ToString());
+        S_POSITION positionPacket = S_POSITION.Parser.ParseFrom(packetBody);
+        Debug.Log("Received S_POSITION_Handler packet: " + positionPacket.ToString());
+        int playerId = (int)positionPacket.PlayerId;
+        Vector3 newPosition = new Vector3(positionPacket.X, positionPacket.Y, positionPacket.Z);
+        // 플레이어의 고유한 식별자를 기반으로 해당 플레이어를 찾아 위치를 업데이트
+        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+        {
+            GameObject playerObject = GameObject.Find(playerId.ToString());
+            if (playerObject != null)
+            {
+                playerObject.transform.position = newPosition;
+            }
+            else
+            {
+                Debug.LogWarning("Player object not found for player ID: " + playerId);
+            }
+        });
 
+     
 
     }
 }
