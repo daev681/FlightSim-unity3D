@@ -7,8 +7,6 @@
 
 
 
-![Desktop 2024 03 05 - 21 56 23 07 mp4_20240305_220410_05](https://github.com/daev681/FlightSim-unity3D/assets/54939319/f85be589-d0da-43ef-8afd-84c46d3e2a6b)
-
 
 ![Desktop 2024 03 05 - 21 56 23 07 mp4_20240305_220410_07](https://github.com/daev681/FlightSim-unity3D/assets/54939319/1bf77284-adc2-4537-a36e-71026a2defcb)
 
