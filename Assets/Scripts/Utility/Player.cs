@@ -4,42 +4,14 @@ public class Player
 {
     private static Player instance;
 
-    public Player(int playerId, string playerName)
-    {
-        this.playerId = playerId;
-        this.playerName = playerName;
-    }
+    private int isLogin;
+    private int playerId;
+    private string playerName;
+    private bool isLoggedIn;
+    private Vector3 currentPosition;
+    private GameObject playerObject;
 
-    public Player(int playerId, Vector3 CurrentPosition)
-    {
-        this.playerId = playerId;
-        this.CurrentPosition = CurrentPosition;
-    }
-
-
-    public int isLogin = 0;
-    public int playerId { get; private set; }
-    public string playerName { get; private set; }
-    public bool IsLoggedIn { get; set; }
-    public Vector3 CurrentPosition { get; set; }
-    public GameObject PlayerObject { get; private set; }
     private Player() { }
-
-    public void SetPlayerId(int id)
-    {
-        playerId = id;
-    }
-
-    // PlayerName 속성에 대한 Getter 및 Setter 함수
-    public string GetPlayerName()
-    {
-        return playerName;
-    }
-
-    public void SetPlayerName(string name)
-    {
-        playerName = name;
-    }
 
     public static Player Instance
     {
@@ -53,22 +25,45 @@ public class Player
         }
     }
 
-    // 플레이어의 위치 업데이트 메서드
-    public void SetPosition(Vector3 newPosition)
+    public int IsLogin
     {
-        CurrentPosition = newPosition;
-
+        get { return isLogin; }
+        set { isLogin = value; }
     }
 
-    // 플레이어의 GameObject 설정 메서드
-    public void SetPlayerObject(GameObject playerObject)
+    public int PlayerId
     {
-        PlayerObject = playerObject;
+        get { return playerId; }
+        set { playerId = value; }
+    }
+
+    public string PlayerName
+    {
+        get { return playerName; }
+        set { playerName = value; }
+    }
+
+    public bool IsLoggedIn
+    {
+        get { return isLoggedIn; }
+        set { isLoggedIn = value; }
+    }
+
+    public Vector3 CurrentPosition
+    {
+        get { return currentPosition; }
+        set { currentPosition = value; }
+    }
+
+    public GameObject PlayerObject
+    {
+        get { return playerObject; }
+        set { playerObject = value; }
     }
 
     // 플레이어가 위치한 평면의 정보를 가져오는 메서드
     public GameObject GetPlayerPlane()
     {
-        return PlayerObject;
+        return playerObject;
     }
 }

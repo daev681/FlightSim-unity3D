@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
+
 
 public interface IPacketHandler
 {
@@ -31,19 +31,20 @@ public class S_LOGIN_Handler : IPacketHandler
                     var me = loginPacket.Players[0];
                     if (!PlayerManager.Instance.IsPlayerAlreadySpawned())
                     {
-                     
-                        // 새로운 플레이어가 접속했을 때만 비행기 생성
-                  
-                        PlayerManager.Instance.SetCurrentPlayer(new Player((int)me.Id, me.Name));
-                        Vector3 currentPosition = new Vector3(0, 450, -2500);
-                        PlayerManager.Instance.AddPlayer((int)me.Id, currentPosition);
-                  
+                        Vector3 currentPosition = new Vector3(me.X, me.Y, me.Z);
+                        Player myPlayer = Player.Instance;
+                        myPlayer.CurrentPosition = currentPosition;
+                        myPlayer.PlayerId = (int)me.Id;
+                        myPlayer.PlayerName = me.Name;
+                        myPlayer.IsLogin = 1;
+                        PlayerManager.Instance.SetCurrentPlayer(myPlayer);
+                        PlayerManager.Instance.SyncPlayers((int)me.Id, myPlayer);              
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
                             GameObject playerObject = GameObject.Find("F15");
                             playerObject.name = me.Id.ToString();
                         });
-                        var enterMessage = new C_ENTER_GAME() { Playerindex = 0, PlayerId = (ulong)me.Id, X = currentPosition.x , Y = currentPosition.y , Z = currentPosition.z };
+                        var enterMessage = new C_ENTER_GAME() { Playerindex = 0 };
                         PacketManager.Instance.SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
                     }
                 }
@@ -59,22 +60,52 @@ public class S_ENTER_GAME_Handler : IPacketHandler
     {
 
         S_ENTER_GAME enterPacket = S_ENTER_GAME.Parser.ParseFrom(packetBody);
-        Debug.Log("Received PKT_S_LOGIN packet: " + enterPacket.ToString());
+        Debug.Log("Received S_ENTER_GAME_Handler packet: " + enterPacket.ToString());
      
         if (enterPacket.Success)
         {
 
             foreach (var player in enterPacket.CurrentAllplayers)
             {
-                if (!PlayerManager.Instance.isPlayerById((int)player.Id)) 
+                if (PlayerManager.Instance.GetCurrentPlayerId() != (int)player.Id) 
                 {
                     Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
-                    PlayerManager.Instance.AddPlayer((int)player.Id, currentPosition);
-                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
-                    {             
-                        Plane.Instance.SpawnF15((int)player.Id, currentPosition);
-                    });
+                    Player myPlayer = Player.Instance;
+                    myPlayer.CurrentPosition = currentPosition;
+                    myPlayer.PlayerId = (int)player.Id;
+                    bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
+                    if (isSync)
+                    {
+                        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                        {
+                            GameObject playerObject = GameObject.Find(player.ToString());
+                            if (playerObject != null)
+                            {
 
+                                playerObject.transform.position = currentPosition;
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Player object not found for player ID: " + player.ToString());
+                            }
+                        });
+                    }
+                    else
+                    {
+                        UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                        {
+                            Plane.Instance.SpawnF15((int)player.Id, currentPosition);
+                        });
+                    }
+                }
+                else
+                {
+                    Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
+                    Player myPlayer = Player.Instance;
+                    myPlayer.CurrentPosition = currentPosition;
+                    myPlayer.PlayerId = (int)player.Id;
+                    PlayerManager.Instance.SetCurrentPlayer(myPlayer);
+                    PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                 }
             }
         }
@@ -88,25 +119,48 @@ public class S_POSITION_Handler : IPacketHandler
         S_POSITION positionPacket = S_POSITION.Parser.ParseFrom(packetBody);
         Debug.Log("Received S_POSITION_Handler packet: " + positionPacket.ToString());
 
-        int receivedPlayerId = (int)positionPacket.PlayerId;
-        Vector3 newPosition = new Vector3(positionPacket.X, positionPacket.Y, positionPacket.Z);
-
-        // 현재 클라이언트의 플레이어 ID와 서버로부터 수신한 플레이어 ID를 비교하여 업데이트할 위치를 결정
-        int currentPlayerId = PlayerManager.Instance.GetCurrentPlayerId();
-        if (currentPlayerId != receivedPlayerId)
+        foreach (var player in positionPacket.CurrentAllplayers)
         {
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            if (PlayerManager.Instance.GetCurrentPlayerId() != (int)player.Id)
             {
-                GameObject playerObject = GameObject.Find(receivedPlayerId.ToString());
-                if (playerObject != null)
+                Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
+                Player myPlayer = Player.Instance;
+                myPlayer.CurrentPosition = currentPosition;
+                myPlayer.PlayerId = (int)player.Id;
+                bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
+                if (isSync)
                 {
-                    playerObject.transform.position = newPosition;
+                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                    {
+                        GameObject playerObject = GameObject.Find(player.ToString());
+                        if (playerObject != null)
+                        {
+
+                            playerObject.transform.position = currentPosition;
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Player object not found for player ID: " + player.ToString());
+                        }
+                    });
                 }
                 else
                 {
-                    Debug.LogWarning("Player object not found for player ID: " + receivedPlayerId);
+                    UnityMainThreadDispatcher.Instance().Enqueue(() =>
+                    {
+                        Plane.Instance.SpawnF15((int)player.Id, currentPosition);
+                    });
                 }
-            });
+            }
+            else
+            {
+                Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
+                Player myPlayer = Player.Instance;
+                myPlayer.CurrentPosition = currentPosition;
+                myPlayer.PlayerId = (int)player.Id;
+                PlayerManager.Instance.SetCurrentPlayer(myPlayer);
+                PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
+            }
         }
     }
 }

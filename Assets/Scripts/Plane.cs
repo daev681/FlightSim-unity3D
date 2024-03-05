@@ -278,6 +278,7 @@ public class Plane : MonoBehaviour {
         // 프리팹 로드
         GameObject f15Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
 
+
         if (f15Prefab != null)
         {
             // 프리팹 복제
@@ -294,12 +295,6 @@ public class Plane : MonoBehaviour {
             // 새로운 위치 및 회전으로 이동
      
              newF15.transform.position = currentPosition;
-             PlayerManager.Instance.UpdateOtherPlayerPosition(playerId,newF15.transform.position);
-
-            
-
-
-            
 
         }
         else
@@ -694,7 +689,6 @@ public class Plane : MonoBehaviour {
         {
             // 서버로 위치 정보 보내기
 
-         
             PlayerManager.Instance.UpdatePlayerPosition(transform.position);
              
    
