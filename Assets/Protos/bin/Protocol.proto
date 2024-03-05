@@ -39,9 +39,24 @@ message S_POSITION {
     repeated Player currentAllplayers = 1;  //  현재 접속한 사용자 
 }
 
-message C_MISSILE {}
+message C_MISSILE {
+    float px = 1;
+    float py = 2;
+    float pz = 3;
+    float rx = 4;
+    float ry = 5;
+    float rz = 6;
+}
 
-message S_MISSILE {}
+message S_MISSILE {
+    uint64 playerId = 1;
+    float px = 2;
+    float py = 3;
+    float pz = 4;
+    float rx = 5;
+    float ry = 6;
+    float rz = 7;
+}
 
 message C_DESTROY {}
 

@@ -33,10 +33,14 @@ namespace Protocol {
             "Q0hBVBIQCghwbGF5ZXJJZBgBIAEoBBILCgNtc2cYAiABKAkiLQoKQ19QT1NJ",
             "VElPThIJCgF4GAEgASgCEgkKAXkYAiABKAISCQoBehgDIAEoAiI5CgpTX1BP",
             "U0lUSU9OEisKEWN1cnJlbnRBbGxwbGF5ZXJzGAEgAygLMhAuUHJvdG9jb2wu",
-            "UGxheWVyIgsKCUNfTUlTU0lMRSILCglTX01JU1NJTEUiCwoJQ19ERVNUUk9Z",
-            "Ii4KCVNfREVTVFJPWRIQCghwbGF5ZXJJZBgBIAEoBBIPCgdzdWNjZXNzGAIg",
-            "ASgEIggKBkNfSU5GTyIrCgZTX0lORk8SIQoHcGxheWVycxgBIAMoCzIQLlBy",
-            "b3RvY29sLlBsYXllcmIGcHJvdG8z"));
+            "UGxheWVyIlMKCUNfTUlTU0lMRRIKCgJweBgBIAEoAhIKCgJweRgCIAEoAhIK",
+            "CgJwehgDIAEoAhIKCgJyeBgEIAEoAhIKCgJyeRgFIAEoAhIKCgJyehgGIAEo",
+            "AiJlCglTX01JU1NJTEUSEAoIcGxheWVySWQYASABKAQSCgoCcHgYAiABKAIS",
+            "CgoCcHkYAyABKAISCgoCcHoYBCABKAISCgoCcngYBSABKAISCgoCcnkYBiAB",
+            "KAISCgoCcnoYByABKAIiCwoJQ19ERVNUUk9ZIi4KCVNfREVTVFJPWRIQCghw",
+            "bGF5ZXJJZBgBIAEoBBIPCgdzdWNjZXNzGAIgASgEIggKBkNfSU5GTyIrCgZT",
+            "X0lORk8SIQoHcGxheWVycxgBIAMoCzIQLlByb3RvY29sLlBsYXllcmIGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Protocol.EnumReflection.Descriptor, global::Protocol.StructReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -48,8 +52,8 @@ namespace Protocol {
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_CHAT), global::Protocol.S_CHAT.Parser, new[]{ "PlayerId", "Msg" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_POSITION), global::Protocol.C_POSITION.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_POSITION), global::Protocol.S_POSITION.Parser, new[]{ "CurrentAllplayers" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_MISSILE), global::Protocol.C_MISSILE.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_MISSILE), global::Protocol.S_MISSILE.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_MISSILE), global::Protocol.C_MISSILE.Parser, new[]{ "Px", "Py", "Pz", "Rx", "Ry", "Rz" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_MISSILE), global::Protocol.S_MISSILE.Parser, new[]{ "PlayerId", "Px", "Py", "Pz", "Rx", "Ry", "Rz" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_DESTROY), global::Protocol.C_DESTROY.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_DESTROY), global::Protocol.S_DESTROY.Parser, new[]{ "PlayerId", "Success" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_INFO), global::Protocol.C_INFO.Parser, null, null, null, null, null),
@@ -1585,12 +1589,84 @@ namespace Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public C_MISSILE(C_MISSILE other) : this() {
+      px_ = other.px_;
+      py_ = other.py_;
+      pz_ = other.pz_;
+      rx_ = other.rx_;
+      ry_ = other.ry_;
+      rz_ = other.rz_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public C_MISSILE Clone() {
       return new C_MISSILE(this);
+    }
+
+    /// <summary>Field number for the "px" field.</summary>
+    public const int PxFieldNumber = 1;
+    private float px_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Px {
+      get { return px_; }
+      set {
+        px_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "py" field.</summary>
+    public const int PyFieldNumber = 2;
+    private float py_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Py {
+      get { return py_; }
+      set {
+        py_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pz" field.</summary>
+    public const int PzFieldNumber = 3;
+    private float pz_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Pz {
+      get { return pz_; }
+      set {
+        pz_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rx" field.</summary>
+    public const int RxFieldNumber = 4;
+    private float rx_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Rx {
+      get { return rx_; }
+      set {
+        rx_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "ry" field.</summary>
+    public const int RyFieldNumber = 5;
+    private float ry_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Ry {
+      get { return ry_; }
+      set {
+        ry_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rz" field.</summary>
+    public const int RzFieldNumber = 6;
+    private float rz_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Rz {
+      get { return rz_; }
+      set {
+        rz_ = value;
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1606,12 +1682,24 @@ namespace Protocol {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Px, other.Px)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Py, other.Py)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Pz, other.Pz)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Rx, other.Rx)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Ry, other.Ry)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Rz, other.Rz)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (Px != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Px);
+      if (Py != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Py);
+      if (Pz != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Pz);
+      if (Rx != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Rx);
+      if (Ry != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Ry);
+      if (Rz != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Rz);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1628,6 +1716,30 @@ namespace Protocol {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (Px != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(Px);
+      }
+      if (Py != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(Py);
+      }
+      if (Pz != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Pz);
+      }
+      if (Rx != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Rx);
+      }
+      if (Ry != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Ry);
+      }
+      if (Rz != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Rz);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1637,6 +1749,30 @@ namespace Protocol {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Px != 0F) {
+        output.WriteRawTag(13);
+        output.WriteFloat(Px);
+      }
+      if (Py != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(Py);
+      }
+      if (Pz != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Pz);
+      }
+      if (Rx != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Rx);
+      }
+      if (Ry != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Ry);
+      }
+      if (Rz != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Rz);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1646,6 +1782,24 @@ namespace Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (Px != 0F) {
+        size += 1 + 4;
+      }
+      if (Py != 0F) {
+        size += 1 + 4;
+      }
+      if (Pz != 0F) {
+        size += 1 + 4;
+      }
+      if (Rx != 0F) {
+        size += 1 + 4;
+      }
+      if (Ry != 0F) {
+        size += 1 + 4;
+      }
+      if (Rz != 0F) {
+        size += 1 + 4;
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1656,6 +1810,24 @@ namespace Protocol {
     public void MergeFrom(C_MISSILE other) {
       if (other == null) {
         return;
+      }
+      if (other.Px != 0F) {
+        Px = other.Px;
+      }
+      if (other.Py != 0F) {
+        Py = other.Py;
+      }
+      if (other.Pz != 0F) {
+        Pz = other.Pz;
+      }
+      if (other.Rx != 0F) {
+        Rx = other.Rx;
+      }
+      if (other.Ry != 0F) {
+        Ry = other.Ry;
+      }
+      if (other.Rz != 0F) {
+        Rz = other.Rz;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1671,6 +1843,30 @@ namespace Protocol {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
+          case 13: {
+            Px = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            Py = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Pz = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Rx = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Ry = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Rz = input.ReadFloat();
+            break;
+          }
         }
       }
     #endif
@@ -1685,6 +1881,30 @@ namespace Protocol {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
+          case 13: {
+            Px = input.ReadFloat();
+            break;
+          }
+          case 21: {
+            Py = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Pz = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Rx = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Ry = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Rz = input.ReadFloat();
+            break;
+          }
         }
       }
     }
@@ -1721,12 +1941,96 @@ namespace Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public S_MISSILE(S_MISSILE other) : this() {
+      playerId_ = other.playerId_;
+      px_ = other.px_;
+      py_ = other.py_;
+      pz_ = other.pz_;
+      rx_ = other.rx_;
+      ry_ = other.ry_;
+      rz_ = other.rz_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public S_MISSILE Clone() {
       return new S_MISSILE(this);
+    }
+
+    /// <summary>Field number for the "playerId" field.</summary>
+    public const int PlayerIdFieldNumber = 1;
+    private ulong playerId_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public ulong PlayerId {
+      get { return playerId_; }
+      set {
+        playerId_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "px" field.</summary>
+    public const int PxFieldNumber = 2;
+    private float px_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Px {
+      get { return px_; }
+      set {
+        px_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "py" field.</summary>
+    public const int PyFieldNumber = 3;
+    private float py_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Py {
+      get { return py_; }
+      set {
+        py_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "pz" field.</summary>
+    public const int PzFieldNumber = 4;
+    private float pz_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Pz {
+      get { return pz_; }
+      set {
+        pz_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rx" field.</summary>
+    public const int RxFieldNumber = 5;
+    private float rx_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Rx {
+      get { return rx_; }
+      set {
+        rx_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "ry" field.</summary>
+    public const int RyFieldNumber = 6;
+    private float ry_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Ry {
+      get { return ry_; }
+      set {
+        ry_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rz" field.</summary>
+    public const int RzFieldNumber = 7;
+    private float rz_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public float Rz {
+      get { return rz_; }
+      set {
+        rz_ = value;
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1742,12 +2046,26 @@ namespace Protocol {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (PlayerId != other.PlayerId) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Px, other.Px)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Py, other.Py)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Pz, other.Pz)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Rx, other.Rx)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Ry, other.Ry)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Rz, other.Rz)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override int GetHashCode() {
       int hash = 1;
+      if (PlayerId != 0UL) hash ^= PlayerId.GetHashCode();
+      if (Px != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Px);
+      if (Py != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Py);
+      if (Pz != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Pz);
+      if (Rx != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Rx);
+      if (Ry != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Ry);
+      if (Rz != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Rz);
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1764,6 +2082,34 @@ namespace Protocol {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (PlayerId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(PlayerId);
+      }
+      if (Px != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(Px);
+      }
+      if (Py != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Py);
+      }
+      if (Pz != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Pz);
+      }
+      if (Rx != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Rx);
+      }
+      if (Ry != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Ry);
+      }
+      if (Rz != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(Rz);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1773,6 +2119,34 @@ namespace Protocol {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (PlayerId != 0UL) {
+        output.WriteRawTag(8);
+        output.WriteUInt64(PlayerId);
+      }
+      if (Px != 0F) {
+        output.WriteRawTag(21);
+        output.WriteFloat(Px);
+      }
+      if (Py != 0F) {
+        output.WriteRawTag(29);
+        output.WriteFloat(Py);
+      }
+      if (Pz != 0F) {
+        output.WriteRawTag(37);
+        output.WriteFloat(Pz);
+      }
+      if (Rx != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(Rx);
+      }
+      if (Ry != 0F) {
+        output.WriteRawTag(53);
+        output.WriteFloat(Ry);
+      }
+      if (Rz != 0F) {
+        output.WriteRawTag(61);
+        output.WriteFloat(Rz);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1782,6 +2156,27 @@ namespace Protocol {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public int CalculateSize() {
       int size = 0;
+      if (PlayerId != 0UL) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(PlayerId);
+      }
+      if (Px != 0F) {
+        size += 1 + 4;
+      }
+      if (Py != 0F) {
+        size += 1 + 4;
+      }
+      if (Pz != 0F) {
+        size += 1 + 4;
+      }
+      if (Rx != 0F) {
+        size += 1 + 4;
+      }
+      if (Ry != 0F) {
+        size += 1 + 4;
+      }
+      if (Rz != 0F) {
+        size += 1 + 4;
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1792,6 +2187,27 @@ namespace Protocol {
     public void MergeFrom(S_MISSILE other) {
       if (other == null) {
         return;
+      }
+      if (other.PlayerId != 0UL) {
+        PlayerId = other.PlayerId;
+      }
+      if (other.Px != 0F) {
+        Px = other.Px;
+      }
+      if (other.Py != 0F) {
+        Py = other.Py;
+      }
+      if (other.Pz != 0F) {
+        Pz = other.Pz;
+      }
+      if (other.Rx != 0F) {
+        Rx = other.Rx;
+      }
+      if (other.Ry != 0F) {
+        Ry = other.Ry;
+      }
+      if (other.Rz != 0F) {
+        Rz = other.Rz;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1807,6 +2223,34 @@ namespace Protocol {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
+          case 8: {
+            PlayerId = input.ReadUInt64();
+            break;
+          }
+          case 21: {
+            Px = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Py = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Pz = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Rx = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Ry = input.ReadFloat();
+            break;
+          }
+          case 61: {
+            Rz = input.ReadFloat();
+            break;
+          }
         }
       }
     #endif
@@ -1821,6 +2265,34 @@ namespace Protocol {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
+          case 8: {
+            PlayerId = input.ReadUInt64();
+            break;
+          }
+          case 21: {
+            Px = input.ReadFloat();
+            break;
+          }
+          case 29: {
+            Py = input.ReadFloat();
+            break;
+          }
+          case 37: {
+            Pz = input.ReadFloat();
+            break;
+          }
+          case 45: {
+            Rx = input.ReadFloat();
+            break;
+          }
+          case 53: {
+            Ry = input.ReadFloat();
+            break;
+          }
+          case 61: {
+            Rz = input.ReadFloat();
+            break;
+          }
         }
       }
     }

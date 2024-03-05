@@ -574,10 +574,14 @@ public class Plane : MonoBehaviour {
     }
 
     void FireMissile(int index) {
+      
         var hardpoint = hardpoints[index];
         var missileGO = Instantiate(missilePrefab, hardpoint.position, hardpoint.rotation);
         var missile = missileGO.GetComponent<Missile>();
         missile.Launch(this, MissileLocked ? Target : null);
+        PlayerManager.Instance.SyncFireMissile(hardpoint.position, hardpoint.rotation);
+
+
     }
 
     void UpdateWeapons(float dt) {
@@ -717,7 +721,7 @@ public class Plane : MonoBehaviour {
             Rigidbody.isKinematic = true;
             Rigidbody.position = contact.point;
             Rigidbody.rotation = Quaternion.Euler(0, Rigidbody.rotation.eulerAngles.y, 0);
-            //NetworkManager.Instance.OnDestroy();
+            NetworkManager.Instance.OnDestroy(int.Parse(transform.name));
 
             foreach (var go in graphics)
             {

@@ -45,9 +45,30 @@ public class PlayerManager
         }
     }
 
+    public bool DeletePlayer(int playerId)
+    {
+        // 플레이어가 있는지 확인하고 있다면 삭제
+        if (players.ContainsKey(playerId))
+        {
+            players.Remove(playerId);
+            var messasge = new C_CHAT()
+            {
+                Msg = playerId + " 님이 파괴되었습니다",
+            };
+            PacketManager.Instance.SendToServer(messasge, PacketType.PKT_C_CHAT);
+            return true;
+        }
+        else
+        {
+
+            return false;
+
+        }
+    }
+
     public bool IsExistPlayer(int playerId)
     {
-     
+
         return players.ContainsKey(playerId);
     }
 
@@ -69,9 +90,9 @@ public class PlayerManager
     }
 
 
-    public void UpdatePlayerPosition(int playerId , Vector3 position)
+    public void UpdatePlayerPosition(int playerId, Vector3 position)
     {
-      
+
         if (Instance.IsExistPlayer(playerId) && IsMainPlayer(playerId))
         {
             // 패킷 생성
@@ -82,13 +103,27 @@ public class PlayerManager
                 Z = position.z
             };
             // 패킷 서버로 전송
-      
+
             PacketManager.Instance.SendToServer(playerPositionMessage, PacketType.PKT_C_POSITION);
         }
-        else{
+        else
+        {
 
         }
     }
 
-
+    public void SyncFireMissile(Vector3 position, Quaternion rotation)
+    {
+            var FireMessage = new C_MISSILE()
+            {
+                Px = position.x,
+                Py = position.y,
+                Pz = position.z,
+                Rx = rotation.x,
+                Ry = rotation.y,
+                Rz = rotation.z,
+            };
+            PacketManager.Instance.SendToServer(FireMessage, PacketType.PKT_C_MISSILE);
+        }
+  
 }

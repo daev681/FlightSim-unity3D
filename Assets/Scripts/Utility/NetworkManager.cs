@@ -114,13 +114,17 @@ public class NetworkManager
         }
     }
 
-    public void OnDestroy()
+    public void OnDestroy(int playerId)
     {
-        if (serverSocket != null && serverSocket.Connected)
+        if (serverSocket != null && serverSocket.Connected && PlayerManager.Instance.IsMainPlayer(playerId))
         {
+            
+            var loginMessage = new C_DESTROY();
+            PacketManager.Instance.SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
             PlayerManager.Instance.ClearPlayers();
             serverSocket.Shutdown(SocketShutdown.Both);
             serverSocket.Close();
+
         }
     }
 }

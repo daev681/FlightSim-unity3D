@@ -10,6 +10,8 @@ public enum PacketType : ushort
     PKT_S_CHAT = 1005,
     PKT_C_POSITION = 1006,
     PKT_S_POSITION = 1007,
+    PKT_C_MISSILE = 1008,
+    PKT_S_MISSILE = 1009,
     PKT_C_DESTORY = 1010,
     PKT_S_DESTORY = 1011,
 }

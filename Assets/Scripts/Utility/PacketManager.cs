@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -113,7 +114,7 @@ public class S_POSITION_Handler : IPacketHandler
 
         foreach (var player in positionPacket.CurrentAllplayers)
         {
-            if (PlayerManager.Instance.IsExistPlayer((int)player.Id) && PlayerManager.Instance.IsMainPlayer((int)player.Id))
+            if (PlayerManager.Instance.IsExistPlayer((int)player.Id) && !PlayerManager.Instance.IsMainPlayer((int)player.Id))
             {
                 Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
                 Player myPlayer = Player.Instance;
@@ -149,6 +150,57 @@ public class S_POSITION_Handler : IPacketHandler
     }
 }
 
+public class PKT_S_MISSILE_Handler : IPacketHandler
+{
+    public void HandlePacket(byte[] packetBody)
+    {
+        S_MISSILE packet = S_MISSILE.Parser.ParseFrom(packetBody);
+        Debug.Log("Received PKT_S_DESTORY_Handler packet: " + packet.ToString());
+        if (!PlayerManager.Instance.IsMainPlayer((int)packet.PlayerId))
+        {
+          
+
+            // 미사일 발사 위치와 회전 정보 가져오기
+            Vector3 position = new Vector3(packet.Px, packet.Py, packet.Pz);
+            Quaternion rotation = Quaternion.Euler(packet.Rx, packet.Ry, packet.Rz);
+
+            // 미사일을 생성하여 발사 위치와 회전에 배치
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                string prefabPath = "Assets/Prefabs/missile.prefab";
+                GameObject missilePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+
+                GameObject missileGO = UnityEngine.Object.Instantiate(missilePrefab, position, rotation);
+
+                var missile = missileGO.GetComponent<Missile>();
+                missile.Launch(Plane.Instance, true ? Plane.Instance.Target : null);
+                //missile.Launch(this, MissileLocked ? Target : null);
+                //missileGO.transform.Translate(Vector3.up * 5f);
+            });
+        }
+      
+    }
+}
+
+
+
+public class PKT_S_DESTORY_Handler : IPacketHandler
+{
+    public void HandlePacket(byte[] packetBody)
+    {
+        S_DESTROY destoryPacket = S_DESTROY.Parser.ParseFrom(packetBody);
+        Debug.Log("Received PKT_S_DESTORY_Handler packet: " + destoryPacket.ToString());
+
+        if (destoryPacket.Success == 1)
+        {
+            PlayerManager.Instance.DeletePlayer((int)destoryPacket.PlayerId);
+        }
+          
+    }
+}
+
+
 
 public class PacketManager
 {
@@ -161,6 +213,8 @@ public class PacketManager
         packetHandlers.Add(PacketType.PKT_S_LOGIN, new S_LOGIN_Handler());
         packetHandlers.Add(PacketType.PKT_S_ENTER_GAME, new S_ENTER_GAME_Handler());
         packetHandlers.Add(PacketType.PKT_S_POSITION, new S_POSITION_Handler());
+        packetHandlers.Add(PacketType.PKT_S_DESTORY, new PKT_S_DESTORY_Handler());
+        packetHandlers.Add(PacketType.PKT_S_MISSILE, new PKT_S_MISSILE_Handler());
     }
 
 
