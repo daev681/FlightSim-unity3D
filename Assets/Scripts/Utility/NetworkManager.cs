@@ -8,7 +8,8 @@ public class NetworkManager
 {
     private static NetworkManager instance;
     private Socket serverSocket { get; set; }
-    private bool serverConnected = false;
+    private bool serverConnected { get; set; }
+
     private NetworkManager() { }
 
     public static NetworkManager Instance
@@ -66,8 +67,6 @@ public class NetworkManager
             {
                 var loginMessage = new C_LOGIN();
                 PacketManager.Instance.SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
-
-
             }
 
             StartReceive();

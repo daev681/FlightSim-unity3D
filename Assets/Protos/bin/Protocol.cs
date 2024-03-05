@@ -33,8 +33,8 @@ namespace Protocol {
             "Q0hBVBIQCghwbGF5ZXJJZBgBIAEoBBILCgNtc2cYAiABKAkiLQoKQ19QT1NJ",
             "VElPThIJCgF4GAEgASgCEgkKAXkYAiABKAISCQoBehgDIAEoAiI5CgpTX1BP",
             "U0lUSU9OEisKEWN1cnJlbnRBbGxwbGF5ZXJzGAEgAygLMhAuUHJvdG9jb2wu",
-            "UGxheWVyIgsKCUNfTUlTU0lMRSILCglTX01JU1NJTEUiCwoJQ19ERVNUT1JZ",
-            "Ii4KCVNfREVTVE9SWRIQCghwbGF5ZXJJZBgBIAEoBBIPCgdzdWNjZXNzGAIg",
+            "UGxheWVyIgsKCUNfTUlTU0lMRSILCglTX01JU1NJTEUiCwoJQ19ERVNUUk9Z",
+            "Ii4KCVNfREVTVFJPWRIQCghwbGF5ZXJJZBgBIAEoBBIPCgdzdWNjZXNzGAIg",
             "ASgEIggKBkNfSU5GTyIrCgZTX0lORk8SIQoHcGxheWVycxgBIAMoCzIQLlBy",
             "b3RvY29sLlBsYXllcmIGcHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
@@ -50,8 +50,8 @@ namespace Protocol {
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_POSITION), global::Protocol.S_POSITION.Parser, new[]{ "CurrentAllplayers" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_MISSILE), global::Protocol.C_MISSILE.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_MISSILE), global::Protocol.S_MISSILE.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_DESTORY), global::Protocol.C_DESTORY.Parser, null, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_DESTORY), global::Protocol.S_DESTORY.Parser, new[]{ "PlayerId", "Success" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_DESTROY), global::Protocol.C_DESTROY.Parser, null, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_DESTROY), global::Protocol.S_DESTROY.Parser, new[]{ "PlayerId", "Success" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.C_INFO), global::Protocol.C_INFO.Parser, null, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Protocol.S_INFO), global::Protocol.S_INFO.Parser, new[]{ "Players" }, null, null, null, null)
           }));
@@ -1828,15 +1828,15 @@ namespace Protocol {
 
   }
 
-  public sealed partial class C_DESTORY : pb::IMessage<C_DESTORY>
+  public sealed partial class C_DESTROY : pb::IMessage<C_DESTROY>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<C_DESTORY> _parser = new pb::MessageParser<C_DESTORY>(() => new C_DESTORY());
+    private static readonly pb::MessageParser<C_DESTROY> _parser = new pb::MessageParser<C_DESTROY>(() => new C_DESTROY());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<C_DESTORY> Parser { get { return _parser; } }
+    public static pb::MessageParser<C_DESTROY> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1849,29 +1849,29 @@ namespace Protocol {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public C_DESTORY() {
+    public C_DESTROY() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public C_DESTORY(C_DESTORY other) : this() {
+    public C_DESTROY(C_DESTROY other) : this() {
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public C_DESTORY Clone() {
-      return new C_DESTORY(this);
+    public C_DESTROY Clone() {
+      return new C_DESTROY(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as C_DESTORY);
+      return Equals(other as C_DESTROY);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(C_DESTORY other) {
+    public bool Equals(C_DESTROY other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1925,7 +1925,7 @@ namespace Protocol {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(C_DESTORY other) {
+    public void MergeFrom(C_DESTROY other) {
       if (other == null) {
         return;
       }
@@ -1964,15 +1964,15 @@ namespace Protocol {
 
   }
 
-  public sealed partial class S_DESTORY : pb::IMessage<S_DESTORY>
+  public sealed partial class S_DESTROY : pb::IMessage<S_DESTROY>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<S_DESTORY> _parser = new pb::MessageParser<S_DESTORY>(() => new S_DESTORY());
+    private static readonly pb::MessageParser<S_DESTROY> _parser = new pb::MessageParser<S_DESTROY>(() => new S_DESTROY());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public static pb::MessageParser<S_DESTORY> Parser { get { return _parser; } }
+    public static pb::MessageParser<S_DESTROY> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
@@ -1985,22 +1985,22 @@ namespace Protocol {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public S_DESTORY() {
+    public S_DESTROY() {
       OnConstruction();
     }
 
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public S_DESTORY(S_DESTORY other) : this() {
+    public S_DESTROY(S_DESTROY other) : this() {
       playerId_ = other.playerId_;
       success_ = other.success_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public S_DESTORY Clone() {
-      return new S_DESTORY(this);
+    public S_DESTROY Clone() {
+      return new S_DESTROY(this);
     }
 
     /// <summary>Field number for the "playerId" field.</summary>
@@ -2027,11 +2027,11 @@ namespace Protocol {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public override bool Equals(object other) {
-      return Equals(other as S_DESTORY);
+      return Equals(other as S_DESTROY);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public bool Equals(S_DESTORY other) {
+    public bool Equals(S_DESTROY other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -2111,7 +2111,7 @@ namespace Protocol {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    public void MergeFrom(S_DESTORY other) {
+    public void MergeFrom(S_DESTROY other) {
       if (other == null) {
         return;
       }

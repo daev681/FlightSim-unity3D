@@ -29,15 +29,15 @@ public class S_LOGIN_Handler : IPacketHandler
                 if (loginPacket.Players.Count > 0)
                 {
                     var me = loginPacket.Players[0];
-                    if (!PlayerManager.Instance.IsPlayerAlreadySpawned())
+                    if (!PlayerManager.Instance.IsExistPlayer((int)me.Id))
                     {
                         Vector3 currentPosition = new Vector3(me.X, me.Y, me.Z);
-                        Player myPlayer = Player.Instance;
+                        Player myPlayer = new Player();
                         myPlayer.CurrentPosition = currentPosition;
                         myPlayer.PlayerId = (int)me.Id;
                         myPlayer.PlayerName = me.Name;
-                        myPlayer.IsLogin = 1;
-                        PlayerManager.Instance.SetCurrentPlayer(myPlayer);
+                        myPlayer.IsMainPlayer = true;
+                        //PlayerManager.Instance.SetCurrentPlayer(myPlayer);
                         PlayerManager.Instance.SyncPlayers((int)me.Id, myPlayer);              
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
@@ -67,18 +67,19 @@ public class S_ENTER_GAME_Handler : IPacketHandler
 
             foreach (var player in enterPacket.CurrentAllplayers)
             {
-                if (PlayerManager.Instance.GetCurrentPlayerId() != (int)player.Id) 
+                if (!PlayerManager.Instance.IsExistPlayer((int)player.Id)) 
                 {
                     Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
                     Player myPlayer = Player.Instance;
                     myPlayer.CurrentPosition = currentPosition;
                     myPlayer.PlayerId = (int)player.Id;
+                    myPlayer.IsMainPlayer = false;
                     bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                     if (isSync)
                     {
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
-                            GameObject playerObject = GameObject.Find(player.ToString());
+                            GameObject playerObject = GameObject.Find(player.Id.ToString());
                             if (playerObject != null)
                             {
 
@@ -86,7 +87,7 @@ public class S_ENTER_GAME_Handler : IPacketHandler
                             }
                             else
                             {
-                                Debug.LogWarning("Player object not found for player ID: " + player.ToString());
+                                Debug.LogWarning("Player object not found for player ID: " + player.Id.ToString());
                             }
                         });
                     }
@@ -97,15 +98,6 @@ public class S_ENTER_GAME_Handler : IPacketHandler
                             Plane.Instance.SpawnF15((int)player.Id, currentPosition);
                         });
                     }
-                }
-                else
-                {
-                    Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
-                    Player myPlayer = Player.Instance;
-                    myPlayer.CurrentPosition = currentPosition;
-                    myPlayer.PlayerId = (int)player.Id;
-                    PlayerManager.Instance.SetCurrentPlayer(myPlayer);
-                    PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                 }
             }
         }
@@ -121,18 +113,19 @@ public class S_POSITION_Handler : IPacketHandler
 
         foreach (var player in positionPacket.CurrentAllplayers)
         {
-            if (PlayerManager.Instance.GetCurrentPlayerId() != (int)player.Id)
+            if (PlayerManager.Instance.IsExistPlayer((int)player.Id) && PlayerManager.Instance.IsMainPlayer((int)player.Id))
             {
                 Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
                 Player myPlayer = Player.Instance;
                 myPlayer.CurrentPosition = currentPosition;
                 myPlayer.PlayerId = (int)player.Id;
+                myPlayer.IsMainPlayer = false;
                 bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                 if (isSync)
                 {
                     UnityMainThreadDispatcher.Instance().Enqueue(() =>
                     {
-                        GameObject playerObject = GameObject.Find(player.ToString());
+                        GameObject playerObject = GameObject.Find(player.Id.ToString());
                         if (playerObject != null)
                         {
 
@@ -140,7 +133,7 @@ public class S_POSITION_Handler : IPacketHandler
                         }
                         else
                         {
-                            Debug.LogWarning("Player object not found for player ID: " + player.ToString());
+                            Debug.LogWarning("Player object not found for player ID: " + player.Id.ToString());
                         }
                     });
                 }
@@ -151,15 +144,6 @@ public class S_POSITION_Handler : IPacketHandler
                         Plane.Instance.SpawnF15((int)player.Id, currentPosition);
                     });
                 }
-            }
-            else
-            {
-                Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
-                Player myPlayer = Player.Instance;
-                myPlayer.CurrentPosition = currentPosition;
-                myPlayer.PlayerId = (int)player.Id;
-                PlayerManager.Instance.SetCurrentPlayer(myPlayer);
-                PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
             }
         }
     }
@@ -282,6 +266,7 @@ public class PacketManager
             Debug.LogError($"Failed to send data to server: {e.Message}");
         }
     }
+
 
     // 메시지 전송이 완료된 후 호출되는 콜백 메서드
     private void SendCallback(IAsyncResult result)

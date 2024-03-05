@@ -10,8 +10,15 @@ public class Player
     private bool isLoggedIn;
     private Vector3 currentPosition;
     private GameObject playerObject;
+    private bool isMainPlayer = false; // 플레이어가 주체인지 여부
 
-    private Player() { }
+    public Player() { }
+
+    public bool IsMainPlayer
+    {
+        get { return isMainPlayer; }
+        set { isMainPlayer = value; }
+    }
 
     public static Player Instance
     {

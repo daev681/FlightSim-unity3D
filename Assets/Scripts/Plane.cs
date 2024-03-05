@@ -143,7 +143,7 @@ public class Plane : MonoBehaviour {
 
     private Player player;
 
-    private float sendInterval = 0.2f; // 위치 정보를 보내는 간격 (예: 1초마다)
+    private float sendInterval = 1.0f; // 위치 정보를 보내는 간격 (예: 1초마다)
     private float timer = 0.0f;
 
     public float MaxHealth {
@@ -685,13 +685,16 @@ public class Plane : MonoBehaviour {
         timer += Time.deltaTime;
 
         // 일정 시간 간격마다 위치 정보를 서버로 보냄
+  
         if (timer >= sendInterval)
         {
             // 서버로 위치 정보 보내기
 
-            PlayerManager.Instance.UpdatePlayerPosition(transform.position);
-             
-   
+            PlayerManager.Instance.UpdatePlayerPosition(int.Parse(transform.name), transform.position);
+
+
+
+
             // 타이머 초기화
             timer = 0.0f;
         }
