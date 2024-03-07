@@ -120,7 +120,7 @@ public class NetworkManager
         {
             
             var loginMessage = new C_DESTROY();
-            PacketManager.Instance.SendToServer(loginMessage, PacketType.PKT_C_LOGIN);
+            PacketManager.Instance.SendToServer(loginMessage, PacketType.PKT_C_DESTORY);
             PlayerManager.Instance.ClearPlayers();
             serverSocket.Shutdown(SocketShutdown.Both);
             serverSocket.Close();

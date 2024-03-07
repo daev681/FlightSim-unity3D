@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Protocol;
-
+using PimDeWitte.UnityMainThreadDispatcher;
 public class PlayerManager
 {
     private static PlayerManager instance;
@@ -50,7 +50,24 @@ public class PlayerManager
         // 플레이어가 있는지 확인하고 있다면 삭제
         if (players.ContainsKey(playerId))
         {
+
             players.Remove(playerId);
+            UnityMainThreadDispatcher.Instance().Enqueue(() =>
+            {
+                GameObject objToDelete = GameObject.Find(playerId.ToString());
+
+            // 객체가 존재하는지 확인 후 삭제합니다.
+            if (objToDelete != null)
+            {
+                // Destroy 함수를 사용하여 객체를 삭제합니다.
+                UnityEngine.Object.Destroy(objToDelete);
+            }
+            else
+            {
+                // 객체가 존재하지 않는 경우에 대한 처리를 추가할 수 있습니다.
+                Debug.LogWarning("Object with name '7번' not found.");
+                }
+            });
             var messasge = new C_CHAT()
             {
                 Msg = playerId + " 님이 파괴되었습니다",
@@ -90,7 +107,7 @@ public class PlayerManager
     }
 
 
-    public void UpdatePlayerPosition(int playerId, Vector3 position)
+    public void UpdatePlayerPosition(int playerId, Vector3 position , Quaternion quaternion)
     {
 
         if (Instance.IsExistPlayer(playerId) && IsMainPlayer(playerId))
@@ -98,9 +115,13 @@ public class PlayerManager
             // 패킷 생성
             var playerPositionMessage = new C_POSITION()
             {
-                X = position.x,
-                Y = position.y,
-                Z = position.z
+                Px = position.x,
+                Py = position.y,
+                Pz = position.z,
+                Rx = quaternion.x,
+                Ry = quaternion.y,
+                Rz = quaternion.z,
+
             };
             // 패킷 서버로 전송
 
@@ -125,5 +146,6 @@ public class PlayerManager
             };
             PacketManager.Instance.SendToServer(FireMessage, PacketType.PKT_C_MISSILE);
         }
+
   
 }

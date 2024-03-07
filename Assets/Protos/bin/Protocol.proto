@@ -30,9 +30,12 @@ message S_CHAT {
 }
 
 message C_POSITION {
-    float x = 1;
-    float y = 2;
-    float z = 3;
+    float px = 1;
+    float py = 2;
+    float pz = 3;
+    float rx = 4;
+    float ry = 5;
+    float rz = 6;
 }
 
 message S_POSITION {

@@ -9,6 +9,7 @@ public class Player
     private string playerName;
     private bool isLoggedIn;
     private Vector3 currentPosition;
+    private Quaternion currentRotation;
     private GameObject playerObject;
     private bool isMainPlayer = false; // 플레이어가 주체인지 여부
 
@@ -61,6 +62,13 @@ public class Player
         get { return currentPosition; }
         set { currentPosition = value; }
     }
+
+    public Quaternion CurrentRotation
+    {
+        get { return currentRotation; }
+        set { currentRotation = value; }
+    }
+
 
     public GameObject PlayerObject
     {

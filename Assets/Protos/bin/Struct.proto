@@ -8,8 +8,11 @@ message Player
 	uint64 id = 1;
 	string name = 2;
 	PlayerType playerType = 3;
-	float x =4;
-	float y =5;
-	float z =6;
+	float px =4;
+	float py =5;
+	float pz =6;
+	float rx =7;
+	float ry =8;
+	float rz =9;
 
 }

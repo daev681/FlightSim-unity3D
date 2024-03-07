@@ -13,7 +13,6 @@ public interface IPacketHandler
 {
     void HandlePacket(byte[] packetBody);
 }
-
 public class S_LOGIN_Handler : IPacketHandler
 {
     public void HandlePacket(byte[] packetBody)
@@ -25,33 +24,39 @@ public class S_LOGIN_Handler : IPacketHandler
             foreach (var player in loginPacket.Players)
             {
                 // PlayerManager.Instance.SyncPlayerInfo((int)player.Id, player.Name);
-              
+
                 // 모든 플레이어를 추가한 후에 현재 플레이어 설정
                 if (loginPacket.Players.Count > 0)
                 {
                     var me = loginPacket.Players[0];
                     if (!PlayerManager.Instance.IsExistPlayer((int)me.Id))
                     {
-                        Vector3 currentPosition = new Vector3(me.X, me.Y, me.Z);
+                        Vector3 currentPosition = new Vector3(me.Px, me.Py, me.Pz);
+                        Quaternion currentRotation = Quaternion.Euler(me.Rx, me.Ry, me.Rz);
                         Player myPlayer = new Player();
                         myPlayer.CurrentPosition = currentPosition;
+                        myPlayer.CurrentRotation = currentRotation;
                         myPlayer.PlayerId = (int)me.Id;
                         myPlayer.PlayerName = me.Name;
                         myPlayer.IsMainPlayer = true;
                         //PlayerManager.Instance.SetCurrentPlayer(myPlayer);
-                        PlayerManager.Instance.SyncPlayers((int)me.Id, myPlayer);              
+                       
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
                             GameObject playerObject = GameObject.Find("F15");
                             playerObject.name = me.Id.ToString();
+                            playerObject.transform.position = currentPosition;
+                            playerObject.transform.rotation = currentRotation;
+                            myPlayer.PlayerObject = playerObject;
                         });
+                        PlayerManager.Instance.SyncPlayers((int)me.Id, myPlayer);
                         var enterMessage = new C_ENTER_GAME() { Playerindex = 0 };
                         PacketManager.Instance.SendToServer(enterMessage, PacketType.PKT_C_ENTER_GAME);
                     }
                 }
             }
         }
-    
+
     }
 }
 
@@ -62,17 +67,19 @@ public class S_ENTER_GAME_Handler : IPacketHandler
 
         S_ENTER_GAME enterPacket = S_ENTER_GAME.Parser.ParseFrom(packetBody);
         Debug.Log("Received S_ENTER_GAME_Handler packet: " + enterPacket.ToString());
-     
+
         if (enterPacket.Success)
         {
 
             foreach (var player in enterPacket.CurrentAllplayers)
             {
-                if (!PlayerManager.Instance.IsExistPlayer((int)player.Id)) 
+                if (!PlayerManager.Instance.IsExistPlayer((int)player.Id))
                 {
-                    Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
+                    Vector3 currentPosition = new Vector3(player.Px, player.Py, player.Pz);
+                    Quaternion currentRotation = Quaternion.Euler(player.Rx, player.Ry, player.Rz);
                     Player myPlayer = Player.Instance;
                     myPlayer.CurrentPosition = currentPosition;
+                    myPlayer.CurrentRotation = currentRotation;
                     myPlayer.PlayerId = (int)player.Id;
                     myPlayer.IsMainPlayer = false;
                     bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
@@ -83,8 +90,8 @@ public class S_ENTER_GAME_Handler : IPacketHandler
                             GameObject playerObject = GameObject.Find(player.Id.ToString());
                             if (playerObject != null)
                             {
-
                                 playerObject.transform.position = currentPosition;
+                                playerObject.transform.rotation = currentRotation;
                             }
                             else
                             {
@@ -116,9 +123,11 @@ public class S_POSITION_Handler : IPacketHandler
         {
             if (PlayerManager.Instance.IsExistPlayer((int)player.Id) && !PlayerManager.Instance.IsMainPlayer((int)player.Id))
             {
-                Vector3 currentPosition = new Vector3(player.X, player.Y, player.Z);
+                Vector3 currentPosition = new Vector3(player.Px, player.Py, player.Pz);
+                Quaternion currentRotation = Quaternion.Euler(player.Rx, player.Ry, player.Rz);
                 Player myPlayer = Player.Instance;
                 myPlayer.CurrentPosition = currentPosition;
+                myPlayer.CurrentRotation = currentRotation;
                 myPlayer.PlayerId = (int)player.Id;
                 myPlayer.IsMainPlayer = false;
                 bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
@@ -129,7 +138,6 @@ public class S_POSITION_Handler : IPacketHandler
                         GameObject playerObject = GameObject.Find(player.Id.ToString());
                         if (playerObject != null)
                         {
-
                             playerObject.transform.position = currentPosition;
                         }
                         else
