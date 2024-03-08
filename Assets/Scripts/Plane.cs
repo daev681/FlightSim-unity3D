@@ -99,8 +99,9 @@ public class Plane : MonoBehaviour {
     float missileDebounceTime;
     [SerializeField]
     GameObject missilePrefab;
-    [SerializeField]
+
     Target target;
+
     [SerializeField]
     float lockRange;
     [SerializeField]
@@ -204,7 +205,7 @@ public class Plane : MonoBehaviour {
     public bool MissileTracking { get; private set; }
     public Target Target {
         get {
-            return target;
+            return PlayerManager.Instance.getMainPlayer().Target;
         }
     }
     public Vector3 MissileLockDirection {
@@ -232,7 +233,7 @@ public class Plane : MonoBehaviour {
         if (instance == null)
         {
             transform.position = initialPosition;
-            instance = this;
+            //instance = this;
             playerManager = PlayerManager.Instance;
             packetManager = PacketManager.Instance;
             networkManager = NetworkManager.Instance;
@@ -249,7 +250,7 @@ public class Plane : MonoBehaviour {
  
 
     void Start() {
-       
+        //target = GameObject.FindObjectOfType<Target>(); // Scene에서 Target 컴포넌트를 찾아서 설정합니다.
         animation = GetComponent<PlaneAnimation>();
         Rigidbody = GetComponent<Rigidbody>();
 
@@ -270,39 +271,7 @@ public class Plane : MonoBehaviour {
   
     }
 
-    public void SpawnF15(int playerId , Vector3 currentPosition)
-    {
-        // 프리팹 경로 설정
-        string prefabPath = "Assets/Prefabs/F15.prefab";
-
-        // 프리팹 로드
-        GameObject f15Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-
-
-        if (f15Prefab != null)
-        {
-            // 프리팹 복제
-            GameObject newF15 = Instantiate(f15Prefab);
-            AIController script = newF15.GetComponent<AIController>();
-            if (script != null)
-            {
-                script.enabled = false;
-            }
-
-            // 복제된 오브젝트 이름 변경
-            newF15.name = playerId.ToString();
-
-            // 새로운 위치 및 회전으로 이동
-     
-             newF15.transform.position = currentPosition;
-
-        }
-        else
-        {
-            Debug.LogError("F15Prefab을 로드할 수 없습니다.");
-        }
-    }
-
+    
   
 
 
@@ -581,7 +550,6 @@ public class Plane : MonoBehaviour {
         missile.Launch(this, MissileLocked ? Target : null);
         PlayerManager.Instance.SyncFireMissile(hardpoint.position, hardpoint.rotation);
 
-
     }
 
     void UpdateWeapons(float dt) {
@@ -609,8 +577,9 @@ public class Plane : MonoBehaviour {
         Vector3 targetDir = Vector3.forward;
         MissileTracking = false;
 
+
         if (Target != null && !Target.Plane.Dead) {
-            var error = target.Position - Rigidbody.position;
+            var error = Target.Position - Rigidbody.position;
             var errorDir = Quaternion.Inverse(Rigidbody.rotation) * error.normalized; //transform into local space
 
             if (error.magnitude <= lockRange && Vector3.Angle(Vector3.forward, errorDir) <= lockAngle) {
@@ -695,9 +664,7 @@ public class Plane : MonoBehaviour {
             // 서버로 위치 정보 보내기
 
             PlayerManager.Instance.UpdatePlayerPosition(int.Parse(transform.name), transform.position , transform.rotation);
-
-
-
+            PlayerManager.Instance.UpdateTargetForMainPlayer(int.Parse(transform.name));
 
             // 타이머 초기화
             timer = 0.0f;

@@ -4194,6 +4194,11 @@ PrefabInstance:
       propertyPath: initialSpeed
       value: 200
       objectReference: {fileID: 0}
+    - target: {fileID: 2515223684704408108, guid: 868b13a7be7adb148b89b9bcf56bb6a6,
+        type: 3}
+      propertyPath: name
+      value: F152
+      objectReference: {fileID: 0}
     - target: {fileID: 3737572916587997159, guid: 868b13a7be7adb148b89b9bcf56bb6a6,
         type: 3}
       propertyPath: m_Enabled

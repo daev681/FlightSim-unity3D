@@ -39,8 +39,9 @@ public class S_LOGIN_Handler : IPacketHandler
                         myPlayer.PlayerId = (int)me.Id;
                         myPlayer.PlayerName = me.Name;
                         myPlayer.IsMainPlayer = true;
+                   
                         //PlayerManager.Instance.SetCurrentPlayer(myPlayer);
-                       
+
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
                             GameObject playerObject = GameObject.Find("F15");
@@ -48,6 +49,7 @@ public class S_LOGIN_Handler : IPacketHandler
                             playerObject.transform.position = currentPosition;
                             playerObject.transform.rotation = currentRotation;
                             myPlayer.PlayerObject = playerObject;
+                            PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                         });
                         PlayerManager.Instance.SyncPlayers((int)me.Id, myPlayer);
                         var enterMessage = new C_ENTER_GAME() { Playerindex = 0 };
@@ -77,7 +79,7 @@ public class S_ENTER_GAME_Handler : IPacketHandler
                 {
                     Vector3 currentPosition = new Vector3(player.Px, player.Py, player.Pz);
                     Quaternion currentRotation = Quaternion.Euler(player.Rx, player.Ry, player.Rz);
-                    Player myPlayer = Player.Instance;
+                    Player myPlayer = new Player();
                     myPlayer.CurrentPosition = currentPosition;
                     myPlayer.CurrentRotation = currentRotation;
                     myPlayer.PlayerId = (int)player.Id;
@@ -92,6 +94,8 @@ public class S_ENTER_GAME_Handler : IPacketHandler
                             {
                                 playerObject.transform.position = currentPosition;
                                 playerObject.transform.rotation = currentRotation;
+                                myPlayer.PlayerObject = playerObject;
+                                PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                             }
                             else
                             {
@@ -103,7 +107,7 @@ public class S_ENTER_GAME_Handler : IPacketHandler
                     {
                         UnityMainThreadDispatcher.Instance().Enqueue(() =>
                         {
-                            Plane.Instance.SpawnF15((int)player.Id, currentPosition);
+                            PlayerManager.Instance.SpawnF15(myPlayer);
                         });
                     }
                 }
@@ -125,9 +129,10 @@ public class S_POSITION_Handler : IPacketHandler
             {
                 Vector3 currentPosition = new Vector3(player.Px, player.Py, player.Pz);
                 Quaternion currentRotation = Quaternion.Euler(player.Rx, player.Ry, player.Rz);
-                Player myPlayer = Player.Instance;
+                Player myPlayer = new Player();
                 myPlayer.CurrentPosition = currentPosition;
                 myPlayer.CurrentRotation = currentRotation;
+                myPlayer.PlayerName = player.Name;
                 myPlayer.PlayerId = (int)player.Id;
                 myPlayer.IsMainPlayer = false;
                 bool isSync = PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
@@ -139,6 +144,9 @@ public class S_POSITION_Handler : IPacketHandler
                         if (playerObject != null)
                         {
                             playerObject.transform.position = currentPosition;
+                            myPlayer.IsMainPlayer = false;
+                            myPlayer.PlayerObject = playerObject;
+                            PlayerManager.Instance.SyncPlayers((int)player.Id, myPlayer);
                         }
                         else
                         {
@@ -150,7 +158,7 @@ public class S_POSITION_Handler : IPacketHandler
                 {
                     UnityMainThreadDispatcher.Instance().Enqueue(() =>
                     {
-                        Plane.Instance.SpawnF15((int)player.Id, currentPosition);
+                        PlayerManager.Instance.SpawnF15(myPlayer);
                     });
                 }
             }

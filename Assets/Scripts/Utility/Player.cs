@@ -12,6 +12,7 @@ public class Player
     private Quaternion currentRotation;
     private GameObject playerObject;
     private bool isMainPlayer = false; // 플레이어가 주체인지 여부
+    private Target target; // 플레이어의 타겟
 
     public Player() { }
 
@@ -69,11 +70,16 @@ public class Player
         set { currentRotation = value; }
     }
 
-
     public GameObject PlayerObject
     {
         get { return playerObject; }
         set { playerObject = value; }
+    }
+
+    public Target Target
+    {
+        get { return target; }
+        set { target = value; }
     }
 
     // 플레이어가 위치한 평면의 정보를 가져오는 메서드
