@@ -18,7 +18,10 @@
 ![위치 동기화](https://github.com/daev681/FlightSim-unity3D/assets/54939319/4fd66f92-aa38-4f5b-8b33-60a816e33d3d)
 3. 이동
 ![실제 이동](https://github.com/daev681/FlightSim-unity3D/assets/54939319/0ba0479a-0845-47e0-a279-c7a5f3efb20a)
-4. 미사일 발사
+
+5. 미사일 발사
+
+6. 
 ![미사일발사](https://github.com/daev681/FlightSim-unity3D/assets/54939319/e23a1ebb-77de-463c-b326-c0079ca5747d)
 
 7. Lock On
