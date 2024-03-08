@@ -21,7 +21,6 @@
 
 5. 미사일 발사
 
-6. 
 ![미사일발사](https://github.com/daev681/FlightSim-unity3D/assets/54939319/e23a1ebb-77de-463c-b326-c0079ca5747d)
 
 7. Lock On
