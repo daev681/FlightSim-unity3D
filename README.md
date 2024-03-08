@@ -19,19 +19,14 @@
 3. 이동
 ![실제 이동](https://github.com/daev681/FlightSim-unity3D/assets/54939319/0ba0479a-0845-47e0-a279-c7a5f3efb20a)
 4. 미사일 발사
-
-7. Lock On
-![Desktop 2024 03 08 - 13 14 40 02 mp4_20240308_132331_02]
-
-8. 미사일 격추 장면
-(https://github.com/daev681/FlightSim-unity3D/assets/54939319/d930590c-4986-4cdd-a15a-63fa10dc12b4)
-
 ![미사일발사](https://github.com/daev681/FlightSim-unity3D/assets/54939319/e23a1ebb-77de-463c-b326-c0079ca5747d)
-5. 파괴
+7. Lock On
+![락온 ](https://github.com/daev681/FlightSim-unity3D/assets/54939319/86f5e7f8-c662-4890-842c-08a32e0b65e2)
+8. 미사일 격추 장면
+![유도 미사일 장면](https://github.com/daev681/FlightSim-unity3D/assets/54939319/d443d868-8a79-47c5-9285-56575608419c)
+9. 파괴
 ![파괴](https://github.com/daev681/FlightSim-unity3D/assets/54939319/6605840c-dc0b-4048-852d-7ee515e699de)
-6. 서버 연산
-
-
+10. 서버 연산
 ![서버연산](https://github.com/daev681/FlightSim-unity3D/assets/54939319/d653c02a-753e-4a42-a30b-60e4b0ac4b7c)
 
 
